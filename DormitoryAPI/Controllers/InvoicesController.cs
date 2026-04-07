@@ -30,8 +30,20 @@ namespace DormitoryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Invoice>> CreateInvoice(Invoice invoice)
         {
+            // 📌 1. ดึงข้อมูลห้องเพื่อหาว่าใครคือผู้เช่าปัจจุบัน
+            var room = await _context.Rooms.FindAsync(invoice.RoomID);
             
+            if (room == null || room.TenantID == null)
+            {
+                return BadRequest(new { message = "ห้องนี้ยังไม่มีผู้เช่า ไม่สามารถออกบิลได้" });
+            }
+
+            // 📌 2. ผูกบิลนี้เข้ากับไอดีของผู้เช่าโดยตรง
+            invoice.TenantID = room.TenantID.Value;
+
+            // คำนวณยอดรวม และเซ็ตสถานะเริ่มต้น
             invoice.TotalAmount = (invoice.WaterUnit * 20) + (invoice.ElectricUnit * 8);
+            invoice.Status = "Unpaid";
 
             _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
@@ -42,54 +54,47 @@ namespace DormitoryAPI.Controllers
         [HttpPost("Pay/{id}")]
         public async Task<IActionResult> PayInvoice(int id)
         {
-            var invoice = await _context.Invoices.Include(i => i.Room).FirstOrDefaultAsync(i => i.InvoiceID == id);
+            var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.InvoiceID == id);
             if (invoice == null) return NotFound();
 
             invoice.Status = "Paid";
             string returnMessage = "ชำระเงินสำเร็จ!";
             
-            
-            if (invoice.Room?.TenantID != null)
+            // 📌 3. อ้างอิง TenantID จากตัวบิลได้เลย ไม่ต้องผ่านข้อมูล Room แล้ว
+            var user = await _context.Users.FindAsync(invoice.TenantID);
+            if (user != null)
             {
-                var user = await _context.Users.FindAsync(invoice.Room.TenantID);
-                if (user != null)
-                {
-                    
-                    int dueDate = 10; 
+                int dueDate = 10; 
 
-                    if (DateTime.Now.Day <= dueDate)
-                    {
-                        user.Points += 10;
-                        returnMessage = "🎉 ชำระเงินสำเร็จ! คุณจ่ายก่อนกำหนด ได้รับ 10 แต้มสะสม";
-                    }
-                    else
-                    {
-                        returnMessage = "✅ ชำระเงินสำเร็จ! (เลยกำหนดชำระ จึงไม่ได้รับแต้มสะสมในรอบนี้)";
-                    }
+                if (DateTime.Now.Day <= dueDate)
+                {
+                    user.Points += 10;
+                    returnMessage = "🎉 ชำระเงินสำเร็จ! คุณจ่ายก่อนกำหนด ได้รับ 10 แต้มสะสม";
+                }
+                else
+                {
+                    returnMessage = "✅ ชำระเงินสำเร็จ! (เลยกำหนดชำระ จึงไม่ได้รับแต้มสะสมในรอบนี้)";
                 }
             }
 
             await _context.SaveChangesAsync();
 
-           
             return Ok(new { message = returnMessage });
         }
         
         [HttpGet("Tenant/{tenantId}")]
         public async Task<ActionResult<IEnumerable<Invoice>>> GetTenantInvoices(int tenantId)
         {
-           
-            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.TenantID == tenantId);
-            
-            if (room == null) 
-                return NotFound(new { message = "ไม่พบข้อมูลห้องพักของคุณ" });
+            // 📌 4. แก้ให้ดึงบิลจาก TenantID โดยตรง (อุดช่องโหว่สำเร็จ!)
+            var invoices = await _context.Invoices
+                                         .Include(i => i.Room)
+                                         .Where(i => i.TenantID == tenantId) // ค้นหาด้วยรหัสผู้เช่าเท่านั้น
+                                         .OrderByDescending(i => i.InvoiceID) // เรียงบิลใหม่ล่าสุดขึ้นก่อน
+                                         .ToListAsync();
 
-           
-            return await _context.Invoices
-                                 .Include(i => i.Room)
-                                 .Where(i => i.RoomID == room.RoomID)
-                                 .ToListAsync();
+            return Ok(invoices);
         }
+
         [HttpPost("UploadSlip/{id}")]
         public async Task<IActionResult> UploadSlip(int id, IFormFile file)
         {
@@ -115,5 +120,4 @@ namespace DormitoryAPI.Controllers
             return Ok(new { url = invoice.PaymentSlipUrl });
         }
     }
-    
 }
