@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dormitory Tenant Portal</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/flatly/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        
+        body, h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .btn {
+            font-family: 'Prompt', sans-serif !important;
+        }
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card-header {
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+        }
+        .table th {
+            font-weight: 500;
+            color: #2c3e50;
+            background-color: #f8f9fa; 
+        }
+        .btn {
+            border-radius: 8px;
+        }
+        .icon-lg {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-primary shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 fw-bold"><i class="bi bi-buildings-fill me-2"></i>Tenant Portal</span>
+            <button id="logoutBtn" class="btn btn-danger btn-sm d-none fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        <div id="login-section" class="row justify-content-center mt-5">
+            <div class="col-md-5">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-dark text-white text-center py-4">
+                        <i class="bi bi-person-circle display-4 d-block mb-2"></i>
+                        <h4 class="mb-0 fw-bold">เข้าสู่ระบบผู้เช่า</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-secondary">Username (ชื่อผู้ใช้)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                    <input type="text" class="form-control" id="loginUsername" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-secondary">Password (รหัสผ่าน)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold py-2"><i class="bi bi-box-arrow-in-right me-1"></i> Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-section" class="row d-none">
+            <div class="col-12 mb-4 d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border-start border-4 border-primary">
+                <h3 class="text-secondary mb-0">ยินดีต้อนรับ, <span id="welcomeName" class="text-dark fw-bold"></span> <span class="badge bg-primary ms-2">ห้อง <span id="roomNumber"></span></span></h3>
+                <button class="btn btn-outline-secondary btn-sm fw-bold" onclick="openProfileModal()"><i class="bi bi-pencil-square me-1"></i>ตั้งค่าโปรไฟล์</button>
+            </div>
+
+            <div class="row mb-4 px-2">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center py-4 d-flex flex-column justify-content-center">
+                            <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-star-fill text-white me-2"></i>My Points</h5>
+                            <h1 class="display-2 fw-bold my-2" id="user-points">0</h1>
+                            <button class="btn btn-dark fw-bold w-100 shadow-sm mt-auto" onclick="redeemPoints()"><i class="bi bi-gift-fill me-1"></i>แลกของรางวัล (ใช้ 50 แต้ม)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card border-info h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0 fw-bold"><i class="bi bi-headset me-2"></i>ติดต่อผู้ดูแล (Contact Admin)</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                            <p class="text-secondary mb-3">หากมีข้อสงสัยหรือเหตุฉุกเฉิน ติดต่อได้ที่:</p>
+                            <h4 class="mb-2 text-dark"><i class="bi bi-telephone-fill text-info me-2"></i><span id="dorm-phone" class="fw-bold">กำลังโหลด...</span></h4>
+                            <h4 class="mb-0 text-success"><i class="bi bi-chat-line-fill me-2"></i><span id="dorm-line" class="fw-bold">กำลังโหลด...</span></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-4">
+                <div class="card border-dark">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-receipt-cutoff me-2"></i>รายการบิลค่าเช่าของฉัน</h5>
+                        <button class="btn btn-light btn-sm fw-bold" onclick="loadTenantDashboard()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+                    </div>
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">เดือน/ปี</th>
+                                    <th>ยอดรวม (บาท)</th>
+                                    <th>สถานะ</th>
+                                    <th class="text-end pe-4">การชำระเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-4">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-tools me-2"></i>แจ้งซ่อม / แจ้งปัญหา (Maintenance)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="maintenanceForm" class="mb-4">
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-chat-text text-danger"></i></span>
+                                <input type="text" id="maintDescription" class="form-control border-start-0 ps-0" placeholder="ระบุปัญหาที่ต้องการแจ้ง เช่น แอร์ไม่เย็น, น้ำรั่ว..." required>
+                                <button class="btn btn-danger fw-bold px-4" type="submit"><i class="bi bi-send-fill me-1"></i>ส่งเรื่อง</button>
+                            </div>
+                        </form>
+                        
+                        <h6 class="fw-bold text-secondary border-bottom pb-2"><i class="bi bi-clock-history me-1"></i>ประวัติการแจ้งเรื่อง:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mt-3">
+                                <thead>
+                                    <tr>
+                                        <th class="text-muted">รหัส</th>
+                                        <th>รายละเอียดปัญหา</th>
+                                        <th>วันที่แจ้ง</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="maintenance-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-lines-fill me-2"></i>จัดการโปรไฟล์ส่วนตัว</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="mb-3">
+                            <label class="form-label text-primary fw-bold">ชื่อ-นามสกุล (แนะนำภาษาอังกฤษสำหรับออกบิล)</label>
+                            <input type="text" class="form-control" id="profileFullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">เบอร์โทรศัพท์ติดต่อ</label>
+                            <input type="text" class="form-control" id="profilePhone" placeholder="08x-xxx-xxxx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-success fw-bold">LINE ID</label>
+                            <input type="text" class="form-control" id="profileLineID" placeholder="กรอก Line ID (ถ้ามี)">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-danger">รหัสผ่านใหม่ (ปล่อยว่างไว้ถ้าไม่ต้องการเปลี่ยน)</label>
+                            <input type="password" class="form-control" id="profilePassword" placeholder="******">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-floppy-fill me-1"></i>บันทึกข้อมูล</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="payBillModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-wallet2 me-2"></i>ยืนยันการชำระเงิน</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>เพื่อความรวดเร็วในการตรวจสอบยอดเงิน กรุณาแนบหลักฐานการโอนเงินครับ
+                    </div>
+                    <div class="mb-3 mt-4">
+                        <label class="form-label fw-bold text-dark"><i class="bi bi-image me-2"></i>อัปโหลดสลิป (ถ้ามี)</label>
+                        <input type="file" class="form-control" id="slipFileInput" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>ยกเลิก</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="submitPayment()"><i class="bi bi-check-circle-fill me-1"></i>ยืนยันชำระเงิน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const API_BASE = 'http://localhost:5054/api'; 
+        let loggedInUser = JSON.parse(localStorage.getItem('tenantUser'));
+        let currentRoomID = null; 
+
+        window.onload = function() {
+            if (loggedInUser) showDashboard();
+        };
+
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/Users/Login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    localStorage.setItem('tenantUser', JSON.stringify(user)); 
+                    loggedInUser = user;
+                    showDashboard();
+                } else {
+                    alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง!');
+                }
+            } catch (error) {
+                alert('ไม่สามารถเชื่อมต่อระบบได้');
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('login-section').classList.add('d-none');
+            document.getElementById('dashboard-section').classList.remove('d-none');
+            document.getElementById('logoutBtn').classList.remove('d-none');
+            document.getElementById('welcomeName').innerText = loggedInUser.fullName;
+            loadTenantDashboard();
+            loadMaintenanceHistory(); 
+        }
+
+        function logout() {
+           if (confirm('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?')) {
+                localStorage.removeItem('tenantUser');
+                location.reload(); 
+            }
+        }
+
+        // โหลดข้อมูล Dashboard 
+        async function loadTenantDashboard() {
+            // ดึงข้อมูลติดต่อแอดมินมาโชว์
+            try {
+                const contactRes = await fetch(`${API_BASE}/Users/AdminContact`);
+                if (contactRes.ok) {
+                    const contactData = await contactRes.json();
+                    document.getElementById('dorm-phone').innerText = contactData.phoneNumber;
+                    document.getElementById('dorm-line').innerText = contactData.lineID;
+                }
+            } catch(e) {} // กัน error ถ้าไม่มี admin
+
+            try {
+                const userRes = await fetch(`${API_BASE}/Users`);
+                const allUsers = await userRes.json();
+                const latestUserData = allUsers.find(u => u.userID === loggedInUser.userID);
+                
+                // อัปเดตข้อมูลล่าสุดให้ User เสมอ
+                if(latestUserData) {
+                    loggedInUser.fullName = latestUserData.fullName;
+                    loggedInUser.phoneNumber = latestUserData.phoneNumber;
+                    document.getElementById('user-points').innerText = latestUserData.points;
+                    document.getElementById('welcomeName').innerText = latestUserData.fullName;
+                }
+
+                const roomRes = await fetch(`${API_BASE}/Rooms`);
+                const allRooms = await roomRes.json();
+                const myRoom = allRooms.find(r => r.tenantID === loggedInUser.userID);
+                if(myRoom) {
+                    currentRoomID = myRoom.roomID;
+                    document.getElementById('roomNumber').innerText = myRoom.roomNumber;
+                }
+
+                const invRes = await fetch(`${API_BASE}/Invoices/Tenant/${loggedInUser.userID}`);
+                const tableBody = document.getElementById('invoice-table-body');
+                tableBody.innerHTML = '';
+
+                if (invRes.ok) {
+                    const invoices = await invRes.json();
+                    
+                    if (invoices.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">ไม่พบรายการบิล</td></tr>';
+                    }
+
+                    invoices.forEach(inv => {
+                        let statusBadge = inv.status === 'Paid' 
+                            ? '<span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Paid</span>' 
+                            : '<span class="badge bg-danger px-3 py-2"><i class="bi bi-exclamation-circle-fill me-1"></i> Unpaid</span>';
+                            
+                        let payButton = inv.status === 'Unpaid' 
+                            ? `<button class="btn btn-sm btn-primary fw-bold" onclick="payBill(${inv.invoiceID})"><i class="bi bi-credit-card-fill me-1"></i> Pay Now</button>` 
+                            : `<button class="btn btn-sm btn-outline-success fw-bold" disabled><i class="bi bi-check-circle-fill me-1"></i> Success</button>`;
+                        
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">${inv.billingMonth}</td>
+                                <td class="text-danger fw-bold fs-5">฿${inv.totalAmount.toLocaleString()}</td>
+                                <td>${statusBadge}</td>
+                                <td class="text-end pe-4">${payButton}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        let currentPayInvoiceID = null;
+
+        function payBill(invoiceID) {
+            currentPayInvoiceID = invoiceID;
+            document.getElementById('slipFileInput').value = ''; 
+            
+            const payModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('payBillModal'));
+            payModal.show();
+        }
+
+        async function submitPayment() {
+            if (!currentPayInvoiceID) return;
+
+            const fileInput = document.getElementById('slipFileInput');
+            const file = fileInput.files[0];
+
+            try {
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const uploadRes = await fetch(`${API_BASE}/Invoices/UploadSlip/${currentPayInvoiceID}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!uploadRes.ok) {
+                        alert('เกิดข้อผิดพลาดในการอัปโหลดรูปสลิป');
+                        return; 
+                    }
+                }
+
+                const payRes = await fetch(`${API_BASE}/Invoices/Pay/${currentPayInvoiceID}`, { method: 'POST' });
+                
+                if (payRes.ok) {
+                    const data = await payRes.json();
+                    
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('payBillModal')).hide();
+                    alert("แจ้งชำระเงินเรียบร้อยแล้ว! " + data.message);
+                    loadTenantDashboard(); 
+                } else {
+                    alert('เกิดข้อผิดพลาดในการแจ้งชำระเงิน');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('ไม่สามารถเชื่อมต่อระบบได้');
+            }
+        }
+
+        async function redeemPoints() {
+            if (confirm('ต้องการใช้ 50 แต้ม เพื่อแลกของรางวัลใช่หรือไม่?')) {
+                const response = await fetch(`${API_BASE}/Users/Redeem/${loggedInUser.userID}`, { method: 'POST' });
+                const data = await response.json();
+                alert(data.message);
+                if (response.ok) loadTenantDashboard();
+            }
+        }
+
+        
+        async function loadMaintenanceHistory() {
+            try {
+                const res = await fetch(`${API_BASE}/Maintenance/Tenant/${loggedInUser.userID}`);
+                const tbody = document.getElementById('maintenance-table-body');
+                tbody.innerHTML = '';
+
+                if(res.ok) {
+                    const requests = await res.json();
+                    if(requests.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">ยังไม่มีประวัติการแจ้งเรื่อง</td></tr>';
+                        return;
+                    }
+
+                    requests.forEach(req => {
+                        let badge = '';
+                        if(req.status === 'Pending') badge = '<span class="badge bg-danger"><i class="bi bi-hourglass-split"></i> รอดำเนินการ</span>';
+                        else if(req.status === 'In Progress') badge = '<span class="badge bg-warning text-dark"><i class="bi bi-tools"></i> กำลังซ่อม</span>';
+                        else badge = '<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> เสร็จสิ้น</span>';
+
+                        const date = new Date(req.createdDate).toLocaleString('th-TH');
+                        
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="text-muted small">#REQ-${req.requestID}</td>
+                                <td><strong>${req.description}</strong></td>
+                                <td class="text-secondary small">${date}</td>
+                                <td>${badge}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        document.getElementById('maintenanceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if(!currentRoomID) {
+                alert('ไม่พบข้อมูลห้องพักของคุณ ไม่สามารถแจ้งเรื่องได้');
+                return;
+            }
+
+            const description = document.getElementById('maintDescription').value;
+            const requestData = {
+                roomID: currentRoomID,
+                tenantID: loggedInUser.userID,
+                description: description
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/Maintenance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                if(res.ok) {
+                    const data = await res.json();
+                    alert(data.message);
+                    document.getElementById('maintenanceForm').reset();
+                    loadMaintenanceHistory(); 
+                }
+            } catch (error) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            }
+        });
+
+        
+        function openProfileModal() {
+            document.getElementById('profileFullName').value = loggedInUser.fullName || '';
+            document.getElementById('profilePhone').value = loggedInUser.phoneNumber || '';
+            document.getElementById('profileLineID').value = loggedInUser.lineID || ''; 
+            document.getElementById('profilePassword').value = ''; 
+
+            const modalElement = document.getElementById('editProfileModal');
+            const profileModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            profileModal.show();
+        }
+
+        document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newFullName = document.getElementById('profileFullName').value;
+            const newPhone = document.getElementById('profilePhone').value;
+            const newLineID = document.getElementById('profileLineID').value; 
+            const newPassword = document.getElementById('profilePassword').value;
+
+            const updateData = {
+                userID: loggedInUser.userID,
+                username: loggedInUser.username,
+                role: loggedInUser.role,
+                points: loggedInUser.points,
+                fullName: newFullName,
+                phoneNumber: newPhone,
+                lineID: newLineID, 
+                passwordHash: newPassword || loggedInUser.passwordHash 
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/Users/${loggedInUser.userID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (res.ok) {
+                    const updatedUser = await res.json();
+                    localStorage.setItem('tenantUser', JSON.stringify(updatedUser)); 
+                    loggedInUser = updatedUser; 
+                    
+                    document.getElementById('welcomeName').innerText = updatedUser.fullName;
+                    
+                    const modalElement = document.getElementById('editProfileModal');
+                    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                    
+                    alert('อัปเดตโปรไฟล์เรียบร้อยแล้ว!');
+                }
+            } catch (error) {
+                alert('เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์');
+            }
+        });
+    </script>
+</body>
+</html>
