@@ -5,7 +5,7 @@ namespace DormitoryAPI.Models
         public int InvoiceID { get; set; }
         public int RoomID { get; set; }
         
-        // 📌 เพิ่มบรรทัดนี้ลงไปครับ (เพื่อแก้ตัวแดง)
+        
         public int TenantID { get; set; } 
         
         public string? BillingMonth { get; set; }

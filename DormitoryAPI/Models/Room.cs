@@ -13,7 +13,7 @@ namespace DormitoryAPI.Models
         public string Status { get; set; } = "Available"; // Available, Occupied, Maintenance
         public decimal BaseRent { get; set; }
         
-        // Foreign Key ไปหาตาราง User (ใช้ int? เพราะห้องอาจจะยังไม่มีคนเช่า)
+        // Foreign Key ไปหาตาราง User 
         public int? TenantID { get; set; } 
         public User? Tenant { get; set; }
     }

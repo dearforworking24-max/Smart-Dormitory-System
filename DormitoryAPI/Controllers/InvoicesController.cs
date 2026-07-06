@@ -30,7 +30,7 @@ namespace DormitoryAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Invoice>> CreateInvoice(Invoice invoice)
         {
-            // 📌 1. ดึงข้อมูลห้องเพื่อหาว่าใครคือผู้เช่าปัจจุบัน
+            //  1. ดึงข้อมูลห้องเพื่อหาว่าใครคือผู้เช่าปัจจุบัน
             var room = await _context.Rooms.FindAsync(invoice.RoomID);
             
             if (room == null || room.TenantID == null)
@@ -38,7 +38,7 @@ namespace DormitoryAPI.Controllers
                 return BadRequest(new { message = "ห้องนี้ยังไม่มีผู้เช่า ไม่สามารถออกบิลได้" });
             }
 
-            // 📌 2. ผูกบิลนี้เข้ากับไอดีของผู้เช่าโดยตรง
+            //  2. ผูกบิลนี้เข้ากับไอดีของผู้เช่าโดยตรง
             invoice.TenantID = room.TenantID.Value;
 
             // คำนวณยอดรวม และเซ็ตสถานะเริ่มต้น
@@ -60,7 +60,7 @@ namespace DormitoryAPI.Controllers
             invoice.Status = "Paid";
             string returnMessage = "ชำระเงินสำเร็จ!";
             
-            // 📌 3. อ้างอิง TenantID จากตัวบิลได้เลย ไม่ต้องผ่านข้อมูล Room แล้ว
+            //  3. อ้างอิง TenantID จากตัวบิลได้เลย ไม่ต้องผ่านข้อมูล Room แล้ว
             var user = await _context.Users.FindAsync(invoice.TenantID);
             if (user != null)
             {
@@ -85,7 +85,7 @@ namespace DormitoryAPI.Controllers
         [HttpGet("Tenant/{tenantId}")]
         public async Task<ActionResult<IEnumerable<Invoice>>> GetTenantInvoices(int tenantId)
         {
-            // 📌 4. แก้ให้ดึงบิลจาก TenantID โดยตรง (อุดช่องโหว่สำเร็จ!)
+            //  4. แก้ให้ดึงบิลจาก TenantID โดยตรง (อุดช่องโหว่สำเร็จ!)
             var invoices = await _context.Invoices
                                          .Include(i => i.Room)
                                          .Where(i => i.TenantID == tenantId) // ค้นหาด้วยรหัสผู้เช่าเท่านั้น
