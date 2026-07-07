@@ -331,6 +331,10 @@
         }
 
         const BASE_URL = 'https://smart-dormitory-api.onrender.com';
+        const API_BASE = `${BASE_URL}/api`;
+        const TENANT_API_URL = `${BASE_URL}/api/Tenants`;
+        const ROOM_API_URL = `${BASE_URL}/api/Rooms`;
+        
         let loggedInUser = JSON.parse(localStorage.getItem('tenantUser'));
         let currentRoomID = null; 
 
