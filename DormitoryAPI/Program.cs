@@ -14,14 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers(); 
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-});
-
+// 📌 1. ประกาศ CORS แค่รอบเดียวพอครับ
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -34,13 +27,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwagger();   
-    app.UseSwaggerUI(); 
-}
+// 📌 2. เรียกใช้ CORS ให้ไวที่สุด (ต้องมาก่อน Controllers และ Static Files)
+app.UseCors("AllowAll"); 
 
+// 📌 3. ปิด HttpsRedirection ชั่วคราวเวลาขึ้น Render ป้องกันการ Error
+// app.UseHttpsRedirection(); 
 
 var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 if (!Directory.Exists(uploadsPath))
@@ -48,17 +39,19 @@ if (!Directory.Exists(uploadsPath))
     Directory.CreateDirectory(uploadsPath);
 }
 
-
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
 
-app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwagger();   
+    app.UseSwaggerUI(); 
+}
 
-
-app.MapControllers(); // API 
+app.MapControllers(); 
 
 app.Run();
