@@ -28,3 +28,7 @@ A full-stack web application designed to streamline dormitory management for bot
 3. Run `dotnet ef database update` to set up the SQLite database
 4. Run `dotnet run` to start the backend server
 5. Open `index.html` (Admin) or `tenant.html` (Tenant) in your browser using Live Server.
+
+## Website
+1. Admin Please access this link https://smart-dormitory-system-git-main-dearforworking24-maxs-projects.vercel.app/
+2. Tenant Please access this link https://smart-dormitory-system.vercel.app/tenant.html
