@@ -17,7 +17,7 @@
         body, h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .btn {
             font-family: 'Prompt', sans-serif !important;
         }
-        /* 📌 Custom Dark Mode สีดำพรีเมียม */
+        
         [data-bs-theme="dark"] body {
             background-color: #121212 !important; 
             color: #e0e0e0;
@@ -1010,7 +1010,7 @@
                     if (tenant) tenantName = tenant.fullName;
                 }
 
-                // 📌 ไฮไลต์การแก้บั๊ก: ดึงหน่วยมาคำนวณและแจกแจงแบบชัดเจน
+                
                 const baseRent = inv.room ? inv.room.baseRent : 0;
                 const waterCost = (inv.waterUnit || 0) * 20;
                 const electricCost = (inv.electricUnit || 0) * 8;
