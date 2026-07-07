@@ -6,9 +6,7 @@
     <title>Smart Dormitory System</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/flatly/bootstrap.min.css" rel="stylesheet">
-    
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,40 +14,105 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        body, h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title {
+        body, h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .btn {
             font-family: 'Prompt', sans-serif !important;
         }
-        .table th {
-            font-weight: 500;
-            color: #2c3e50;
-            background-color: #f8f9fa; 
+        /* 📌 Custom Dark Mode สีดำพรีเมียม */
+        [data-bs-theme="dark"] body {
+            background-color: #121212 !important; 
+            color: #e0e0e0;
         }
-        .card {
-            border-radius: 10px; 
+        [data-bs-theme="dark"] .card {
+            background-color: #1e1e1e !important; 
+            border: 1px solid #333 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        [data-bs-theme="dark"] .card-header {
+            background-color: #252525 !important;
+            border-bottom: 1px solid #333 !important;
+        }
+        [data-bs-theme="dark"] .table {
+            --bs-table-bg: transparent;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+        [data-bs-theme="dark"] .table-light th, [data-bs-theme="dark"] .table thead th {
+            background-color: #252525 !important;
+            color: #fff;
+            border-bottom: 1px solid #444;
+        }
+        [data-bs-theme="dark"] .navbar {
+            background-color: #0a0a0a !important; 
         }
         
-        .btn {
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        /* 📌 คืนชีพสีให้ 3 การ์ดบนในโหมดมืด (สไตล์เรืองแสง + ขอบซ้าย) */
+        [data-bs-theme="dark"] #card-total {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), #1e1e1e) !important;
+            border: 1px solid rgba(13, 110, 253, 0.3) !important;
+            border-left: 5px solid #0d6efd !important; 
+        }
+        [data-bs-theme="dark"] #card-available {
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.15), #1e1e1e) !important;
+            border: 1px solid rgba(25, 135, 84, 0.3) !important;
+            border-left: 5px solid #198754 !important; 
+        }
+        [data-bs-theme="dark"] #card-occupied {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.15), #1e1e1e) !important;
+            border: 1px solid rgba(220, 53, 69, 0.3) !important;
+            border-left: 5px solid #dc3545 !important; 
+        }
+        [data-bs-theme="dark"] #card-total *, 
+        [data-bs-theme="dark"] #card-available *, 
+        [data-bs-theme="dark"] #card-occupied * {
+            color: #ffffff !important;
+        }
+
+        
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #fff;
+        }
+        [data-bs-theme="dark"] .form-control:focus, [data-bs-theme="dark"] .form-select:focus {
+            background-color: #333;
+            border-color: #0d6efd;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        [data-bs-theme="dark"] .input-group-text {
+            background-color: #252525;
+            border-color: #444;
+            color: #aaa;
+        }
+        [data-bs-theme="dark"] .modal-content {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0;
+        }
+        [data-bs-theme="dark"] .text-dark {
+            color: #ffffff !important;
         }
     </style>
 </head>
 <body class="bg-light">
     
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container d-flex justify-content-between">
-            <span class="navbar-brand mb-0 h1"><i class="bi bi-buildings-fill"></i> Smart Dormitory System</span>
-            <button class="btn btn-outline-light btn-sm fw-bold" onclick="openAdminProfile()">⚙️ ตั้งค่าช่องทางติดต่อ</button>
+    <nav class="navbar navbar-dark bg-dark shadow-sm mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand mb-0 h1 fw-bold"><i class="bi bi-buildings-fill me-2"></i>Smart Dormitory</span>
+            <div>
+                <button id="themeToggleBtn" class="btn btn-outline-light btn-sm me-2 fw-bold" onclick="toggleTheme()">
+                    <i class="bi bi-moon-fill" id="themeIcon"></i> โหมดมืด
+                </button>
+                <button class="btn btn-outline-light btn-sm fw-bold" onclick="openAdminProfile()">⚙️ ตั้งค่า</button>
+            </div>
         </div>
     </nav>
 
     <div class="container mt-5">
-        
         <div class="row mb-4">
             <div class="col-md-8">
                 <div class="row h-100">
                     <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card bg-primary text-white shadow-sm border-0 h-100">
+                        <div class="card bg-primary text-white shadow-sm border-0 h-100" id="card-total">
                             <div class="card-body">
                                 <h6 class="text-uppercase mb-1"><i class="bi bi-buildings"></i> จำนวนห้อง</h6>
                                 <h2 class="display-5 fw-bold mb-0" id="stat-total">0</h2>
@@ -57,7 +120,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card bg-success text-white shadow-sm border-0 h-100">
+                        <div class="card bg-success text-white shadow-sm border-0 h-100" id="card-available">
                             <div class="card-body">
                                 <h6 class="text-uppercase mb-1"><i class="bi bi-check-circle"></i> ว่าง (Available)</h6>
                                 <h2 class="display-5 fw-bold mb-0" id="stat-available">0</h2>
@@ -65,7 +128,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card bg-danger text-white shadow-sm border-0 h-100">
+                        <div class="card bg-danger text-white shadow-sm border-0 h-100" id="card-occupied">
                             <div class="card-body">
                                 <h6 class="text-uppercase mb-1"><i class="bi bi-person-fill"></i> มีผู้เช่า (Occupied)</h6>
                                 <h2 class="display-5 fw-bold mb-0" id="stat-occupied">0</h2>
@@ -74,7 +137,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
@@ -86,97 +148,128 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+
+        <div class="row mb-4">
             <div class="col-md-12">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm border-primary">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Room Status (สถานะห้องพัก)</h5>
+                        <h5 class="mb-0 fw-bold">Room Status (สถานะห้องพัก)</h5>
                         <div>
-                            <button class="btn btn-warning btn-sm fw-bold shadow-sm" onclick="exportToPDF()"><i class="bi bi-file-earmark-pdf-fill"></i> Download PDF</button>
-                            <button class="btn btn-light btn-sm ms-2 shadow-sm" onclick="fetchRooms()">🔄 Refresh Data</button>
-                            <button class="btn btn-success btn-sm ms-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#addRoomModal">➕ Add Room</button>
-                            <button class="btn btn-dark btn-sm ms-2 shadow-sm" onclick="openAddTenantModal()"><i class="bi bi-person-plus-fill"></i> Add Tenant</button>
+                            <button class="btn btn-warning btn-sm fw-bold shadow-sm" onclick="exportToPDF()"><i class="bi bi-file-earmark-pdf-fill"></i> PDF</button>
+                            <button class="btn btn-light btn-sm ms-2 shadow-sm text-dark fw-bold" onclick="fetchRooms()">🔄 Refresh</button>
+                            <button class="btn btn-success btn-sm ms-2 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addRoomModal">➕ Add Room</button>
+                            <button class="btn btn-dark btn-sm ms-2 shadow-sm fw-bold" onclick="openAddTenantModal()"><i class="bi bi-person-plus-fill"></i> Add Tenant</button>
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-hover mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Room ID</th>
-                                    <th>Room Number</th>
-                                    <th>Status</th>
-                                    <th>Base Rent (THB)</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="room-table-body">
-                                </tbody>
-                        </table>
+                        <div class="d-flex mb-3 gap-2" style="max-width: 400px;">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchRoom" class="form-control border-start-0" placeholder="ค้นหาเลขห้อง..." oninput="handleRoomFilter()">
+                            </div>
+                            <select id="filterRoom" class="form-select form-select-sm shadow-sm" onchange="handleRoomFilter()">
+                                <option value="all">สถานะทั้งหมด</option>
+                                <option value="Available">Available (ว่าง)</option>
+                                <option value="Occupied">Occupied (มีผู้เช่า)</option>
+                                <option value="Maintenance">Maintenance (ซ่อมบำรุง)</option>
+                            </select>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mt-2">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Room Number</th>
+                                        <th>Status</th>
+                                        <th>Base Rent (THB)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="room-table-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="text-muted small d-flex align-items-center gap-2">
+                                <span>แสดง</span>
+                                <select id="limitRoom" class="form-select form-select-sm w-auto" onchange="changeLimitRoom()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                                <span id="infoRoom">รายการ | 0-0 จาก 0</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="prevRoom" onclick="prevRoom()"><i class="bi bi-chevron-left"></i></button>
+                                <span class="btn btn-sm btn-secondary disabled border-secondary" id="pageRoom" style="background: transparent; color: inherit; opacity: 1;">1 / 1</span>
+                                <button class="btn btn-sm btn-outline-secondary" id="nextRoom" onclick="nextRoom()"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    
 
-    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Create New Room</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addRoomForm">
-                        <div class="mb-3">
-                            <label class="form-label">Room Number (เลขห้อง)</label>
-                            <input type="text" class="form-control" id="inputRoomNumber" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Base Rent (ค่าเช่าพื้นฐาน)</label>
-                            <input type="number" class="form-control" id="inputBaseRent" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Status (สถานะ)</label>
-                            <select class="form-select" id="inputStatus">
-                                <option value="Available">Available</option>
-                                <option value="Maintenance">Maintenance</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Save Room</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-4 mb-5">
+        <div class="row mb-4">
             <div class="col-md-12">
                 <div class="card shadow-sm border-info">
                     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-dark fw-bold">🧾 Invoice Management (ติดตามบิลค่าเช่า)</h5>
-                        <button class="btn btn-light btn-sm shadow-sm text-dark fw-bold" onclick="fetchInvoices()">🔄 Refresh Bills</button>
+                        <h5 class="mb-0 fw-bold">🧾 Invoice Management (ติดตามบิลค่าเช่า)</h5>
+                        <button class="btn btn-light btn-sm shadow-sm text-dark fw-bold" onclick="fetchInvoices()">🔄 Refresh</button>
                     </div>
                     <div class="card-body">
-                        <table class="table table-hover mt-2">
-                            <thead>
-                                <tr>
-                                    <th>Invoice ID</th>
-                                    <th>Room</th>
-                                    <th>เดือน/ปี (Month)</th>
-                                    <th>ยอดรวม (Total)</th>
-                                    <th>สถานะ (Status)</th>
-                                    <th>หลักฐาน</th> <th>จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoice-table-body">
-                                </tbody>
-                        </table>
+                        <div class="d-flex mb-3 gap-2" style="max-width: 450px;">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchInvoice" class="form-control border-start-0" placeholder="ค้นหาเลขห้อง หรือ รหัสบิล..." oninput="handleInvoiceFilter()">
+                            </div>
+                            <select id="filterInvoice" class="form-select form-select-sm shadow-sm" onchange="handleInvoiceFilter()">
+                                <option value="all">สถานะทั้งหมด</option>
+                                <option value="Paid">Paid (จ่ายแล้ว)</option>
+                                <option value="Unpaid">Unpaid (ยังไม่จ่าย)</option>
+                            </select>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mt-2">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Invoice ID</th>
+                                        <th>Room</th>
+                                        <th>เดือน/ปี</th>
+                                        <th>ยอดรวม</th>
+                                        <th>สถานะ</th>
+                                        <th>หลักฐาน</th> 
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoice-table-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="text-muted small d-flex align-items-center gap-2">
+                                <span>แสดง</span>
+                                <select id="limitInvoice" class="form-select form-select-sm w-auto" onchange="changeLimitInvoice()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                                <span id="infoInvoice">รายการ | 0-0 จาก 0</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="prevInvoice" onclick="prevInvoice()"><i class="bi bi-chevron-left"></i></button>
+                                <span class="btn btn-sm btn-secondary disabled border-secondary" id="pageInvoice" style="background: transparent; color: inherit; opacity: 1;">1 / 1</span>
+                                <button class="btn btn-sm btn-outline-secondary" id="nextInvoice" onclick="nextInvoice()"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-4 mb-5">
+
+        <div class="row mb-4">
             <div class="col-md-12">
                 <div class="card shadow-sm border-danger">
                     <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
@@ -184,25 +277,57 @@
                         <button class="btn btn-light btn-sm shadow-sm text-dark fw-bold" onclick="fetchMaintenance()">🔄 Refresh</button>
                     </div>
                     <div class="card-body">
-                        <table class="table table-hover mt-2">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>ห้อง</th>
-                                    <th>รายละเอียดปัญหา</th>
-                                    <th>วันที่แจ้ง</th>
-                                    <th>สถานะ</th>
-                                    <th>จัดการสถานะ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-maintenance-body">
-                                </tbody>
-                        </table>
+                        <div class="d-flex mb-3 gap-2" style="max-width: 450px;">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchMaint" class="form-control border-start-0" placeholder="ค้นหาเลขห้อง หรือ ปัญหา..." oninput="handleMaintFilter()">
+                            </div>
+                            <select id="filterMaint" class="form-select form-select-sm shadow-sm" onchange="handleMaintFilter()">
+                                <option value="all">สถานะทั้งหมด</option>
+                                <option value="Pending">รอดำเนินการ</option>
+                                <option value="In Progress">กำลังซ่อม</option>
+                                <option value="Resolved">เสร็จสิ้น</option>
+                            </select>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mt-2">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ห้อง</th>
+                                        <th>รายละเอียดปัญหา</th>
+                                        <th>วันที่แจ้ง</th>
+                                        <th>สถานะ</th>
+                                        <th>จัดการสถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-maintenance-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="text-muted small d-flex align-items-center gap-2">
+                                <span>แสดง</span>
+                                <select id="limitMaint" class="form-select form-select-sm w-auto" onchange="changeLimitMaint()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                                <span id="infoMaint">รายการ | 0-0 จาก 0</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="prevMaint" onclick="prevMaint()"><i class="bi bi-chevron-left"></i></button>
+                                <span class="btn btn-sm btn-secondary disabled border-secondary" id="pageMaint" style="background: transparent; color: inherit; opacity: 1;">1 / 1</span>
+                                <button class="btn btn-sm btn-outline-secondary" id="nextMaint" onclick="nextMaint()"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-4 mb-5">
+
+        <div class="row mb-5">
             <div class="col-md-12">
                 <div class="card shadow-sm border-dark">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
@@ -210,358 +335,623 @@
                         <button class="btn btn-light btn-sm shadow-sm text-dark fw-bold" onclick="fetchTenants()">🔄 Refresh</button>
                     </div>
                     <div class="card-body">
-                        <table class="table table-hover mt-2">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>ชื่อผู้เช่า (Name)</th>
-                                    <th>ห้อง (Room)</th>
-                                    <th>📞 เบอร์โทร</th>
-                                    <th>💬 LINE ID</th>
-                                    <th>จัดการ (Action)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tenant-table-body">
-                                </tbody>
-                        </table>
+                        <div class="d-flex mb-3 gap-2" style="max-width: 400px;">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchTenant" class="form-control border-start-0" placeholder="ค้นหาชื่อผู้เช่า หรือ เบอร์โทร..." oninput="handleTenantFilter()">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mt-2">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ชื่อผู้เช่า (Name)</th>
+                                        <th>ห้อง (Room)</th>
+                                        <th>📞 เบอร์โทร</th>
+                                        <th>💬 LINE ID</th>
+                                        <th>จัดการ (Action)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tenant-table-body"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <div class="text-muted small d-flex align-items-center gap-2">
+                                <span>แสดง</span>
+                                <select id="limitTenant" class="form-select form-select-sm w-auto" onchange="changeLimitTenant()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                                <span id="infoTenant">รายการ | 0-0 จาก 0</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="prevTenant" onclick="prevTenant()"><i class="bi bi-chevron-left"></i></button>
+                                <span class="btn btn-sm btn-secondary disabled border-secondary" id="pageTenant" style="background: transparent; color: inherit; opacity: 1;">1 / 1</span>
+                                <button class="btn btn-sm btn-outline-secondary" id="nextTenant" onclick="nextTenant()"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-    <div class="modal fade" id="editRoomModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Edit Room</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editRoomForm">
-                        <input type="hidden" id="editRoomID">
-                        <div class="mb-3">
-                            <label class="form-label">Room Number</label>
-                            <input type="text" class="form-control" id="editRoomNumber" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Base Rent</label>
-                            <input type="number" class="form-control" id="editBaseRent" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="editStatus">
-                                <option value="Available">Available</option>
-                                <option value="Occupied">Occupied</option>
-                                <option value="Maintenance">Maintenance</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Update Room</button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <div class="modal fade" id="issueBillModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">ออกบิลค่าเช่า (Issue Invoice)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="issueBillForm">
-                        <input type="hidden" id="billRoomID">
-                        <div class="mb-3">
-                            <label class="form-label">เดือนที่เรียกเก็บ (เช่น 2026-04)</label>
-                            <input type="month" class="form-control" id="billMonth" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">หน่วยน้ำประปาที่ใช้</label>
-                            <input type="number" class="form-control" id="billWater" placeholder="ใส่จำนวนหน่วยน้ำ" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">หน่วยไฟฟ้าที่ใช้</label>
-                            <input type="number" class="form-control" id="billElectric" placeholder="ใส่จำนวนหน่วยไฟ" required>
-                        </div>
-                        <button type="submit" class="btn btn-info w-100 text-white fw-bold">บันทึกและส่งบิล</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="addTenantModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">👥 เพิ่มผู้เช่าใหม่ (Add Tenant)</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addTenantForm">
-                        <div class="mb-3">
-                            <label class="form-label">ชื่อ-นามสกุล</label>
-                            <input type="text" class="form-control" id="tenantFullName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Username (สำหรับล็อกอิน)</label>
-                            <input type="text" class="form-control" id="tenantUsername" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control" id="tenantPassword" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold text-primary">เลือกห้องพัก (แสดงเฉพาะห้องว่าง)</label>
-                            <select class="form-select border-primary" id="tenantRoomSelect" required>
-                                </select>
-                        </div>
-                        <button type="submit" class="btn btn-dark w-100 fw-bold">บันทึกข้อมูลและย้ายเข้าห้อง</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="adminProfileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">⚙️ ตั้งค่าช่องทางติดต่อ (สำหรับผู้เช่า)</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="adminProfileForm">
-                        <div class="mb-3">
-                            <label class="form-label">เบอร์โทรศัพท์ส่วนกลาง</label>
-                            <input type="text" class="form-control" id="adminPhone" placeholder="08x-xxx-xxxx">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-success fw-bold">LINE ID ส่วนกลาง</label>
-                            <input type="text" class="form-control" id="adminLineID" placeholder="@smartdorm">
-                        </div>
-                        <button type="submit" class="btn btn-dark w-100 fw-bold">บันทึกข้อมูลติดต่อ</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-success text-white"><h5 class="modal-title">Create New Room</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="addRoomForm"><div class="mb-3"><label class="form-label">Room Number</label><input type="text" class="form-control" id="inputRoomNumber" required></div><div class="mb-3"><label class="form-label">Base Rent</label><input type="number" class="form-control" id="inputBaseRent" required></div><div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="inputStatus"><option value="Available">Available</option><option value="Maintenance">Maintenance</option></select></div><button type="submit" class="btn btn-success w-100 fw-bold">Save Room</button></form></div></div></div></div>
+    <div class="modal fade" id="editRoomModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">Edit Room</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="editRoomForm"><input type="hidden" id="editRoomID"><div class="mb-3"><label class="form-label">Room Number</label><input type="text" class="form-control" id="editRoomNumber" required></div><div class="mb-3"><label class="form-label">Base Rent</label><input type="number" class="form-control" id="editBaseRent" required></div><div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="editStatus"><option value="Available">Available</option><option value="Occupied">Occupied</option><option value="Maintenance">Maintenance</option></select></div><button type="submit" class="btn btn-primary w-100 fw-bold">Update Room</button></form></div></div></div></div>
+    <div class="modal fade" id="issueBillModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-info text-white"><h5 class="modal-title">ออกบิลค่าเช่า (Issue Invoice)</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="issueBillForm"><input type="hidden" id="billRoomID"><div class="mb-3"><label class="form-label">เดือนที่เรียกเก็บ (เช่น 2026-04)</label><input type="month" class="form-control" id="billMonth" required></div><div class="mb-3"><label class="form-label">หน่วยน้ำประปาที่ใช้</label><input type="number" class="form-control" id="billWater" required></div><div class="mb-3"><label class="form-label">หน่วยไฟฟ้าที่ใช้</label><input type="number" class="form-control" id="billElectric" required></div><button type="submit" class="btn btn-info w-100 text-white fw-bold">บันทึกและส่งบิล</button></form></div></div></div></div>
+    <div class="modal fade" id="addTenantModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-dark text-white"><h5 class="modal-title">👥 เพิ่มผู้เช่าใหม่</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="addTenantForm"><div class="mb-3"><label class="form-label">ชื่อ-นามสกุล</label><input type="text" class="form-control" id="tenantFullName" required></div><div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="tenantUsername" required></div><div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="tenantPassword" required></div><div class="mb-4"><label class="form-label fw-bold text-primary">เลือกห้องพัก</label><select class="form-select border-primary" id="tenantRoomSelect" required></select></div><button type="submit" class="btn btn-dark w-100 fw-bold">บันทึกข้อมูลและย้ายเข้า</button></form></div></div></div></div>
+    <div class="modal fade" id="adminProfileModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header bg-dark text-white"><h5 class="modal-title">⚙️ ตั้งค่าช่องทางติดต่อ</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="adminProfileForm"><div class="mb-3"><label class="form-label">เบอร์โทรศัพท์ส่วนกลาง</label><input type="text" class="form-control" id="adminPhone"></div><div class="mb-3"><label class="form-label text-success fw-bold">LINE ID ส่วนกลาง</label><input type="text" class="form-control" id="adminLineID"></div><button type="submit" class="btn btn-dark w-100 fw-bold">บันทึกข้อมูลติดต่อ</button></form></div></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = 'http://localhost:5054/api/Rooms';
-        const INVOICE_API_URL = 'http://localhost:5054/api/Invoices'; 
-        const USER_API_URL = 'http://localhost:5054/api/Users';
+        const BASE_URL = 'https://smart-dormitory-api.onrender.com';
+        const API_URL = `${BASE_URL}/api/Rooms`;
+        const INVOICE_API_URL = `${BASE_URL}/api/Invoices`;
+        const USER_API_URL = `${BASE_URL}/api/Users`;
+        const MAINT_API_URL = `${BASE_URL}/api/Maintenance`;
         let myChart = null;
 
-       
+        //  Dark/Light Mode 
+        const htmlElement = document.documentElement; 
+        const themeIcon = document.getElementById('themeIcon');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        applyTheme(localStorage.getItem('dormTheme') || 'light');
+
+        function toggleTheme() {
+            const newTheme = htmlElement.getAttribute('data-bs-theme') === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem('dormTheme', newTheme);
+        }
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-bs-theme', theme);
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-sun-fill text-warning'; 
+                themeToggleBtn.innerHTML = '<i class="bi bi-sun-fill text-warning"></i> โหมดสว่าง';
+            } else {
+                themeIcon.className = 'bi bi-moon-fill'; 
+                themeToggleBtn.innerHTML = '<i class="bi bi-moon-fill"></i> โหมดมืด';
+            }
+        }
+
+        // . State & Pagination Variables 
+        // ROOMS
+        let allRooms = [], filteredRooms = [];
+        let currPageRoom = 1, limitRoom = 5;
+        
+        // INVOICES
+        let allInvoices = [], filteredInvoices = [];
+        let currPageInv = 1, limitInv = 5;
+
+        // MAINTENANCE
+        let allMaint = [], filteredMaint = [];
+        let currPageMaint = 1, limitMaint = 5;
+
+        // TENANTS
+        let allTenants = [], filteredTenants = [], globalRoomsForTenants = [];
+        let currPageTenant = 1, limitTenant = 5;
+
+
+        // ================= 3. ROOMS LOGIC =================
         async function fetchRooms() {
             try {
                 const response = await fetch(API_URL);
-                const rooms = await response.json();
-
-              
-                document.getElementById('stat-total').innerText = rooms.length;
-                document.getElementById('stat-available').innerText = rooms.filter(r => r.status === 'Available').length;
-                document.getElementById('stat-occupied').innerText = rooms.filter(r => r.status === 'Occupied').length;
+                allRooms = await response.json();
                 
-         
-                const tableBody = document.getElementById('room-table-body');
-                tableBody.innerHTML = ''; 
-
-                rooms.forEach(room => {
-                    let statusBadge = '';
-                    if (room.status === 'Available') statusBadge = '<span class="badge bg-success">Available</span>';
-                    else if (room.status === 'Occupied') statusBadge = '<span class="badge bg-danger">Occupied</span>';
-                    else statusBadge = `<span class="badge bg-warning text-dark">${room.status}</span>`;
-
-                    let actionButtons = `
-                        <button class="btn btn-outline-success btn-sm fw-bold" onclick="openBillModal(${room.roomID})"><i class="bi bi-receipt"></i> ออกบิล</button>
-                        <button class="btn btn-outline-primary btn-sm" onclick="editRoom(${room.roomID})"><i class="bi bi-pencil-square"></i></button>
-                    `;
-
-                    if (room.status === 'Occupied') {
-                        actionButtons += ` <button class="btn btn-outline-warning btn-sm fw-bold text-dark" onclick="moveOut(${room.roomID})">🚪 ย้ายออก</button>`;
-                    } else {
-                        actionButtons += ` <button class="btn btn-outline-danger btn-sm" onclick="deleteRoom(${room.roomID})">🗑️</button>`;
-                    }
-
-                    const row = `
-                        <tr>
-                            <td>${room.roomID}</td>
-                            <td><strong>${room.roomNumber}</strong></td>
-                            <td>${statusBadge}</td>
-                            <td>฿${room.baseRent.toLocaleString()}</td>
-                            <td>${actionButtons}</td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
-                });
-
-            
+                // Update Top Cards & Chart 
+                document.getElementById('stat-total').innerText = allRooms.length;
+                document.getElementById('stat-available').innerText = allRooms.filter(r => r.status === 'Available').length;
+                document.getElementById('stat-occupied').innerText = allRooms.filter(r => r.status === 'Occupied').length;
+                
                 const ctx = document.getElementById('roomChart').getContext('2d');
-                
-               
-                if (myChart) { myChart.destroy(); } 
-                
+                if (myChart) myChart.destroy(); 
                 myChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Available', 'Occupied', 'Maintenance'],
                         datasets: [{
                             data: [
-                                rooms.filter(r => r.status === 'Available').length,
-                                rooms.filter(r => r.status === 'Occupied').length,
-                                rooms.filter(r => r.status === 'Maintenance').length
+                                allRooms.filter(r => r.status === 'Available').length,
+                                allRooms.filter(r => r.status === 'Occupied').length,
+                                allRooms.filter(r => r.status === 'Maintenance').length
                             ],
                             backgroundColor: ['#20c997', '#e74c3c', '#f39c12'], 
-                            borderWidth: 0,
-                            hoverOffset: 4
+                            borderWidth: 0, hoverOffset: 4
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { 
-                            legend: { display: false } 
-                        },
-                        cutout: '75%' 
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
                 });
 
-            } catch (error) { 
-                console.error('Error fetching rooms:', error);
-                alert('ไม่สามารถเชื่อมต่อกับ Backend ได้ โปรดตรวจสอบให้แน่ใจว่า API กำลังทำงานอยู่');
-            }
+                handleRoomFilter();
+            } catch (error) { console.error('Error rooms:', error); }
         }
-        
 
-        
-        document.getElementById('addRoomForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const roomData = {
-                roomNumber: document.getElementById('inputRoomNumber').value,
-                baseRent: parseFloat(document.getElementById('inputBaseRent').value),
-                status: document.getElementById('inputStatus').value,
-                tenantID: null
-            };
+        function handleRoomFilter() {
+            const search = document.getElementById('searchRoom').value.toLowerCase();
+            const status = document.getElementById('filterRoom').value;
+            filteredRooms = allRooms.filter(r => {
+                const mSearch = r.roomNumber.toLowerCase().includes(search);
+                const mStatus = status === 'all' || r.status === status;
+                return mSearch && mStatus;
+            });
+            currPageRoom = 1;
+            renderRooms();
+        }
 
+        function renderRooms() {
+            const tbody = document.getElementById('room-table-body');
+            tbody.innerHTML = '';
+            
+            const start = (currPageRoom - 1) * limitRoom;
+            const paginated = filteredRooms.slice(start, start + limitRoom);
+
+            if (paginated.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">ไม่พบข้อมูล</td></tr>';
+
+            paginated.forEach(room => {
+                let statusBadge = room.status === 'Available' ? '<span class="badge bg-success">Available</span>' :
+                                  room.status === 'Occupied' ? '<span class="badge bg-danger">Occupied</span>' :
+                                  `<span class="badge bg-warning text-dark">${room.status}</span>`;
+
+                let actionButtons = `<button class="btn btn-outline-success btn-sm fw-bold me-1" onclick="openBillModal(${room.roomID})"><i class="bi bi-receipt"></i> ออกบิล</button>
+                                     <button class="btn btn-outline-primary btn-sm me-1" onclick="editRoom(${room.roomID})"><i class="bi bi-pencil-square"></i></button>`;
+                
+                if (room.status === 'Occupied') actionButtons += `<button class="btn btn-outline-warning btn-sm fw-bold text-dark" onclick="moveOut(${room.roomID})">🚪 ย้ายออก</button>`;
+                else actionButtons += `<button class="btn btn-outline-danger btn-sm" onclick="deleteRoom(${room.roomID})">🗑️</button>`;
+
+                tbody.innerHTML += `<tr>
+                    <td class="text-muted">#${room.roomID}</td>
+                    <td><strong>${room.roomNumber}</strong></td>
+                    <td>${statusBadge}</td>
+                    <td class="fw-bold">฿${room.baseRent.toLocaleString()}</td>
+                    <td>${actionButtons}</td>
+                </tr>`;
+            });
+            updatePagination('Room', filteredRooms.length, currPageRoom, limitRoom);
+        }
+        function changeLimitRoom() { limitRoom = parseInt(document.getElementById('limitRoom').value); handleRoomFilter(); }
+        function prevRoom() { if (currPageRoom > 1) { currPageRoom--; renderRooms(); } }
+        function nextRoom() { if (currPageRoom < Math.ceil(filteredRooms.length / limitRoom)) { currPageRoom++; renderRooms(); } }
+
+
+        //  INVOICES LOGIC 
+        async function fetchInvoices() {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(roomData)
-                });
+                const res = await fetch(INVOICE_API_URL);
+                allInvoices = await res.json();
+                handleInvoiceFilter();
+            } catch (error) { console.error('Error invoices:', error); }
+        }
 
-                if (response.ok) {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addRoomModal'));
-                    modal.hide();
-                    document.getElementById('addRoomForm').reset();
-                    fetchRooms();
-                    alert('เพิ่มห้องพักสำเร็จ!');
-                }
-            } catch (error) {
-                alert('เชื่อมต่อ API ไม่ได้');
-            }
-        });
+        function handleInvoiceFilter() {
+            const search = document.getElementById('searchInvoice').value.toLowerCase();
+            const status = document.getElementById('filterInvoice').value;
+            filteredInvoices = allInvoices.filter(i => {
+                const rNum = i.room ? i.room.roomNumber.toLowerCase() : '';
+                const invId = i.invoiceID.toString();
+                const mSearch = rNum.includes(search) || invId.includes(search);
+                const mStatus = status === 'all' || i.status === status;
+                return mSearch && mStatus;
+            });
+            currPageInv = 1;
+            renderInvoices();
+        }
 
-        
-        async function deleteRoom(id) {
-            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบห้องพักนี้?')) {
+        function renderInvoices() {
+            const tbody = document.getElementById('invoice-table-body');
+            tbody.innerHTML = '';
+            const start = (currPageInv - 1) * limitInv;
+            const paginated = filteredInvoices.slice(start, start + limitInv);
+
+            if (paginated.length === 0) tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">ไม่พบข้อมูล</td></tr>';
+
+            paginated.forEach(inv => {
+                let badge = inv.status === 'Paid' ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Paid</span>' 
+                                                  : '<span class="badge bg-danger"><i class="bi bi-exclamation-circle-fill"></i> Unpaid</span>';
+                let room = inv.room ? `ห้อง ${inv.room.roomNumber}` : 'ไม่ทราบห้อง';
+                let slip = inv.paymentSlipUrl ? `<a href="http://localhost:5054${inv.paymentSlipUrl}" target="_blank" class="btn btn-sm btn-info text-white fw-bold shadow-sm"><i class="bi bi-image"></i> ดูสลิป</a>` 
+                                              : '<span class="text-muted small">ยังไม่มีสลิป</span>';
+                
+                //   (ค่าเช่า + น้ำ + ไฟ)
+                let baseRent = inv.room ? inv.room.baseRent : 0;
+                let waterCost = (inv.waterUnit || 0) * 20;
+                let electricCost = (inv.electricUnit || 0) * 8;
+                let realTotalAmount = baseRent + waterCost + electricCost;
+
+                tbody.innerHTML += `<tr>
+                    <td class="text-muted">#INV-${inv.invoiceID.toString().padStart(4, '0')}</td>
+                    <td><strong>${room}</strong></td>
+                    <td>${inv.billingMonth}</td>
+                    <td class="text-danger fw-bold">฿${realTotalAmount.toLocaleString()}</td>
+                    <td>${badge}</td>
+                    <td>${slip}</td>
+                    <td><button class="btn btn-outline-danger btn-sm fw-bold shadow-sm" onclick="exportInvoicePDF(${inv.invoiceID})"><i class="bi bi-file-earmark-pdf-fill"></i> โหลด PDF</button></td>
+                </tr>`;
+            });
+            updatePagination('Invoice', filteredInvoices.length, currPageInv, limitInv);
+        }
+        function changeLimitInvoice() { limitInv = parseInt(document.getElementById('limitInvoice').value); handleInvoiceFilter(); }
+        function prevInvoice() { if (currPageInv > 1) { currPageInv--; renderInvoices(); } }
+        function nextInvoice() { if (currPageInv < Math.ceil(filteredInvoices.length / limitInv)) { currPageInv++; renderInvoices(); } }
+
+
+        //  MAINTENANCE LOGIC 
+        async function fetchMaintenance() {
+            try {
+                const res = await fetch(MAINT_API_URL);
+                allMaint = await res.json();
+                handleMaintFilter();
+            } catch (error) { console.error('Error maint:', error); }
+        }
+
+        function handleMaintFilter() {
+            const search = document.getElementById('searchMaint').value.toLowerCase();
+            const status = document.getElementById('filterMaint').value;
+            filteredMaint = allMaint.filter(m => {
+                const rNum = m.room ? m.room.roomNumber.toLowerCase() : '';
+                const desc = m.description.toLowerCase();
+                const mSearch = rNum.includes(search) || desc.includes(search);
+                const mStatus = status === 'all' || m.status === status;
+                return mSearch && mStatus;
+            });
+            currPageMaint = 1;
+            renderMaintenance();
+        }
+
+        function renderMaintenance() {
+            const tbody = document.getElementById('admin-maintenance-body');
+            tbody.innerHTML = '';
+            const start = (currPageMaint - 1) * limitMaint;
+            const paginated = filteredMaint.slice(start, start + limitMaint);
+
+            if (paginated.length === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">ไม่พบข้อมูล</td></tr>';
+
+            paginated.forEach(req => {
+                let badge = req.status === 'Pending' ? '<span class="badge bg-danger">รอดำเนินการ</span>' :
+                            req.status === 'In Progress' ? '<span class="badge bg-warning text-dark">กำลังซ่อม</span>' :
+                            '<span class="badge bg-success">เสร็จสิ้น</span>';
+                let roomNum = req.room ? `ห้อง ${req.room.roomNumber}` : 'ไม่ทราบห้อง';
+                let date = new Date(req.createdDate).toLocaleString('th-TH');
+
+                let btns = '';
+                if(req.status === 'Pending') btns = `<button class="btn btn-sm btn-warning fw-bold text-dark" onclick="updateMaintStatus(${req.requestID}, 'In Progress')">🛠️ รับเรื่องซ่อม</button>`;
+                else if (req.status === 'In Progress') btns = `<button class="btn btn-sm btn-success fw-bold" onclick="updateMaintStatus(${req.requestID}, 'Resolved')">✅ ปิดงาน</button>`;
+                else btns = `<span class="text-success fw-bold"><i class="bi bi-check-all"></i> ปิดงานแล้ว</span>`;
+
+                tbody.innerHTML += `<tr>
+                    <td class="text-muted">#REQ-${req.requestID}</td>
+                    <td><strong>${roomNum}</strong></td>
+                    <td class="text-danger">${req.description}</td>
+                    <td class="small">${date}</td>
+                    <td>${badge}</td>
+                    <td>${btns}</td>
+                </tr>`;
+            });
+            updatePagination('Maint', filteredMaint.length, currPageMaint, limitMaint);
+        }
+        function changeLimitMaint() { limitMaint = parseInt(document.getElementById('limitMaint').value); handleMaintFilter(); }
+        function prevMaint() { if (currPageMaint > 1) { currPageMaint--; renderMaintenance(); } }
+        function nextMaint() { if (currPageMaint < Math.ceil(filteredMaint.length / limitMaint)) { currPageMaint++; renderMaintenance(); } }
+
+
+        //  TENANTS LOGIC 
+        async function fetchTenants() {
+            try {
+                const [uRes, rRes] = await Promise.all([fetch(USER_API_URL), fetch(API_URL)]);
+                const users = await uRes.json();
+                globalRoomsForTenants = await rRes.json();
+                allTenants = users.filter(u => u.role === 'Tenant');
+                handleTenantFilter();
+            } catch (error) { console.error('Error tenants:', error); }
+        }
+
+        function handleTenantFilter() {
+            const search = document.getElementById('searchTenant').value.toLowerCase();
+            filteredTenants = allTenants.filter(t => {
+                const name = t.fullName.toLowerCase();
+                const phone = t.phoneNumber ? t.phoneNumber.toLowerCase() : '';
+                return name.includes(search) || phone.includes(search);
+            });
+            currPageTenant = 1;
+            renderTenants();
+        }
+
+        function renderTenants() {
+            const tbody = document.getElementById('tenant-table-body');
+            tbody.innerHTML = '';
+            const start = (currPageTenant - 1) * limitTenant;
+            const paginated = filteredTenants.slice(start, start + limitTenant);
+
+            if (paginated.length === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">ไม่พบข้อมูล</td></tr>';
+
+            paginated.forEach(tenant => {
+                const room = globalRoomsForTenants.find(r => r.tenantID === tenant.userID);
+                const roomDisp = room ? `<span class="badge bg-primary">ห้อง ${room.roomNumber}</span>` : '<span class="badge bg-secondary">ยังไม่มีห้อง</span>';
+                const phone = tenant.phoneNumber || '<span class="text-muted">-</span>';
+                const line = tenant.lineID ? `<span class="text-success fw-bold">${tenant.lineID}</span>` : '<span class="text-muted">-</span>';
+
+                tbody.innerHTML += `<tr>
+                    <td class="text-muted">#${tenant.userID}</td>
+                    <td><strong>${tenant.fullName}</strong></td>
+                    <td>${roomDisp}</td>
+                    <td>${phone}</td>
+                    <td>${line}</td>
+                    <td><button class="btn btn-sm btn-outline-danger fw-bold" onclick="deleteTenant(${tenant.userID})">🗑️ ลบออกจากระบบ</button></td>
+                </tr>`;
+            });
+            updatePagination('Tenant', filteredTenants.length, currPageTenant, limitTenant);
+        }
+        function changeLimitTenant() { limitTenant = parseInt(document.getElementById('limitTenant').value); handleTenantFilter(); }
+        function prevTenant() { if (currPageTenant > 1) { currPageTenant--; renderTenants(); } }
+        function nextTenant() { if (currPageTenant < Math.ceil(filteredTenants.length / limitTenant)) { currPageTenant++; renderTenants(); } }
+
+
+        //  Helper: Update Pagination UI 
+        function updatePagination(suffix, totalItems, currPage, limit) {
+            const totalPages = Math.ceil(totalItems / limit) || 1;
+            const startItem = totalItems === 0 ? 0 : ((currPage - 1) * limit) + 1;
+            const endItem = Math.min(currPage * limit, totalItems);
+
+            document.getElementById(`info${suffix}`).innerText = `รายการ | ${startItem}-${endItem} จาก ${totalItems}`;
+            document.getElementById(`page${suffix}`).innerText = `${currPage} / ${totalPages}`;
+            document.getElementById(`prev${suffix}`).disabled = currPage === 1;
+            document.getElementById(`next${suffix}`).disabled = currPage === totalPages;
+        }
+
+        // Existing CRUD Actions 
+
+        //  จัดการห้องพัก 
+// เพิ่มห้องพักใหม่
+            document.getElementById('addRoomForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const d = {
+                    roomNumber: document.getElementById('inputRoomNumber').value,
+                    baseRent: parseFloat(document.getElementById('inputBaseRent').value),
+                    status: document.getElementById('inputStatus').value,
+                    tenantID: null
+                };
                 try {
-                    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-                    if (response.ok) {
-                        alert('ลบห้องพักเรียบร้อยแล้ว');
-                        fetchRooms(); 
+                    const r = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(d)
+                    });
+                    
+                    if (r.ok) {
+                        bootstrap.Modal.getInstance(document.getElementById('addRoomModal')).hide();
+                        document.getElementById('addRoomForm').reset();
+                        fetchRooms();
+                        alert('เพิ่มห้องสำเร็จ!');
                     }
-                } catch (error) {
-                    alert('เชื่อมต่อ API ไม่ได้');
+                } catch (e) {
+                    alert('API Error');
                 }
-            }
-        }
-
-       
-        async function editRoom(id) {
-            try {
-                const response = await fetch(`${API_URL}/${id}`);
-                const room = await response.json();
-
-                document.getElementById('editRoomID').value = room.roomID;
-                document.getElementById('editRoomNumber').value = room.roomNumber;
-                document.getElementById('editBaseRent').value = room.baseRent;
-                document.getElementById('editStatus').value = room.status;
-
-                const editModal = new bootstrap.Modal(document.getElementById('editRoomModal'));
-                editModal.show();
-            } catch (error) {
-                alert('โหลดข้อมูลห้องไม่สำเร็จ');
-            }
-        }
-
-        document.getElementById('editRoomForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('editRoomID').value;
-            const updatedData = {
-                roomID: parseInt(id),
-                roomNumber: document.getElementById('editRoomNumber').value,
-                baseRent: parseFloat(document.getElementById('editBaseRent').value),
-                status: document.getElementById('editStatus').value
-            };
-
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedData)
             });
 
-            if (response.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('editRoomModal')).hide();
-                fetchRooms();
-                alert('แก้ไขข้อมูลสำเร็จ!');
-            }
-        });
-
-        
-        function openBillModal(roomID) {
-            document.getElementById('billRoomID').value = roomID;
-            const modalElement = document.getElementById('issueBillModal');
-            const billModal = bootstrap.Modal.getOrCreateInstance(modalElement);
-            billModal.show();
-        }
-
-        
-        document.getElementById('issueBillForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const invoiceData = {
-                roomID: parseInt(document.getElementById('billRoomID').value),
-                billingMonth: document.getElementById('billMonth').value,
-                waterUnit: parseInt(document.getElementById('billWater').value),
-                electricUnit: parseInt(document.getElementById('billElectric').value),
-                status: "Unpaid"
-            };
-
-            try {
-                const response = await fetch(INVOICE_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(invoiceData)
-                });
-
-                if (response.ok) {
-                    bootstrap.Modal.getInstance(document.getElementById('issueBillModal')).hide();
-                    document.getElementById('issueBillForm').reset();
-                    alert('ออกบิลให้ผู้เช่าสำเร็จแล้ว!');
-                } else {
-                    alert('เกิดข้อผิดพลาดในการออกบิล');
+            // ลบห้องพัก
+            async function deleteRoom(id) {
+                if (confirm('ลบห้องพัก?')) {
+                    try {
+                        const r = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                        if (r.ok) fetchRooms();
+                    } catch (e) {
+                        alert('API Error');
+                    }
                 }
-            } catch (error) {
-                alert('เชื่อมต่อ API ไม่ได้');
             }
-        });
 
+            // แก้ไขห้องพัก
+            async function editRoom(id) {
+                try {
+                    const r = await fetch(`${API_URL}/${id}`);
+                    const rm = await r.json();
+                    
+                    document.getElementById('editRoomID').value = rm.roomID;
+                    document.getElementById('editRoomNumber').value = rm.roomNumber;
+                    document.getElementById('editBaseRent').value = rm.baseRent;
+                    document.getElementById('editStatus').value = rm.status;
+                    
+                    new bootstrap.Modal(document.getElementById('editRoomModal')).show();
+                } catch (e) {
+                    alert('Error');
+                }
+            }
+
+            // บันทึกการแก้ไข
+            document.getElementById('editRoomForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const id = document.getElementById('editRoomID').value;
+                const d = {
+                    roomID: parseInt(id),
+                    roomNumber: document.getElementById('editRoomNumber').value,
+                    baseRent: parseFloat(document.getElementById('editBaseRent').value),
+                    status: document.getElementById('editStatus').value
+                };
+                
+                const r = await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(d)
+                });
+                
+                if (r.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('editRoomModal')).hide();
+                    fetchRooms();
+                    alert('อัปเดตสำเร็จ!');
+                }
+            });
+
+      //  จัดการบิลค่าเช่า (Invoice Management) 
+
+            // เปิดหน้าต่างออกบิล
+            function openBillModal(id) {
+                document.getElementById('billRoomID').value = id;
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('issueBillModal')).show();
+            }
+
+            // บันทึกการออกบิล
+            document.getElementById('issueBillForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const d = {
+                    roomID: parseInt(document.getElementById('billRoomID').value),
+                    billingMonth: document.getElementById('billMonth').value,
+                    waterUnit: parseInt(document.getElementById('billWater').value),
+                    electricUnit: parseInt(document.getElementById('billElectric').value),
+                    status: "Unpaid"
+                };
+                
+                try {
+                    const r = await fetch(INVOICE_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(d)
+                    });
+                    
+                    if (r.ok) {
+                        bootstrap.Modal.getInstance(document.getElementById('issueBillModal')).hide();
+                        document.getElementById('issueBillForm').reset();
+                        alert('ออกบิลสำเร็จ!');
+                        fetchInvoices();
+                    }
+                } catch (e) {
+                    alert('API Error');
+                }
+            });
+
+            //  จัดการผู้เช่า (Tenant Management)
+
+            // เปิดหน้าต่างเพิ่มผู้เช่า
+            async function openAddTenantModal() {
+                try {
+                    const r = await fetch(API_URL);
+                    const rooms = await r.json();
+                    const s = document.getElementById('tenantRoomSelect');
+                    
+                    s.innerHTML = '<option value="" disabled selected>-- เลือกห้อง --</option>';
+                    const av = rooms.filter(x => x.status === 'Available');
+                    
+                    if (av.length === 0) {
+                        s.innerHTML = '<option value="" disabled>❌ ไม่มีห้องว่าง</option>';
+                    } else {
+                        av.forEach(x => {
+                            s.innerHTML += `<option value="${x.roomID}">ห้อง ${x.roomNumber} (฿${x.baseRent})</option>`;
+                        });
+                    }
+                    
+                    new bootstrap.Modal(document.getElementById('addTenantModal')).show();
+                } catch (e) {
+                    alert('Error');
+                }
+            }
+
+            // บันทึกการเพิ่มผู้เช่าใหม่
+            document.getElementById('addTenantForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const rId = document.getElementById('tenantRoomSelect').value;
+                if (!rId) return alert('เลือกห้องด้วยครับ');
+                
+                const u = {
+                    username: document.getElementById('tenantUsername').value,
+                    passwordHash: document.getElementById('tenantPassword').value,
+                    role: "Tenant",
+                    fullName: document.getElementById('tenantFullName').value,
+                    points: 0
+                };
+                
+                try {
+                    const ur = await fetch(USER_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(u)
+                    });
+                    
+                    if (ur.ok) {
+                        const cu = await ur.json();
+                        const rr = await fetch(`${API_URL}/${rId}`);
+                        const ro = await rr.json();
+                        
+                        ro.tenantID = cu.userID;
+                        ro.status = "Occupied";
+                        
+                        await fetch(`${API_URL}/${rId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(ro)
+                        });
+                        
+                        bootstrap.Modal.getInstance(document.getElementById('addTenantModal')).hide();
+                        document.getElementById('addTenantForm').reset();
+                        fetchRooms();
+                        fetchTenants();
+                        alert('เพิ่มผู้เช่าสำเร็จ!');
+                    }
+                } catch (e) {
+                    alert('Error');
+                }
+            });
+
+            // ย้ายออก
+            async function moveOut(id) {
+                if (confirm('ย้ายออก?')) {
+                    try {
+                        const r = await fetch(`${API_URL}/${id}`);
+                        const d = await r.json();
+                        
+                        d.tenantID = null;
+                        d.status = "Available";
+                        
+                        const u = await fetch(`${API_URL}/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(d)
+                        });
+                        
+                        if (u.ok) {
+                            alert('ย้ายออกสำเร็จ!');
+                            fetchRooms();
+                            fetchTenants();
+                        }
+                    } catch (e) {
+                        alert('Error');
+                    }
+                }
+            }
+
+            // ลบผู้เช่า
+            async function deleteTenant(id) {
+                if (confirm('ลบผู้เช่า?')) {
+                    try {
+                        const r = await fetch(`${USER_API_URL}/${id}`, { method: 'DELETE' });
+                        if (r.ok) {
+                            alert('ลบสำเร็จ');
+                            fetchTenants();
+                            fetchRooms();
+                        }
+                    } catch (e) {
+                        alert('Error');
+                    }
+                }
+            }
+
+            //  4. จัดการแจ้งซ่อม (Maintenance Management) 
+
+            // อัปเดตสถานะแจ้งซ่อม
+            async function updateMaintStatus(id, s) {
+                try {
+                    const r = await fetch(`${MAINT_API_URL}/${id}/Status/${s}`, { method: 'PUT' });
+                    if (r.ok) fetchMaintenance();
+                } catch (e) {
+                    alert('Error');
+                }
+            }
         
+        let adminID = null;
+        async function openAdminProfile() { try { const r = await fetch(USER_API_URL); const u = await r.json(); const ad = u.find(x => x.role === 'Admin'); if(ad) { adminID = ad.userID; document.getElementById('adminPhone').value = ad.phoneNumber || ''; document.getElementById('adminLineID').value = ad.lineID || ''; bootstrap.Modal.getOrCreateInstance(document.getElementById('adminProfileModal')).show(); } } catch(e) {} }
+        document.getElementById('adminProfileForm').addEventListener('submit', async function(e) { e.preventDefault(); const r = await fetch(USER_API_URL); const u = await r.json(); const ad = u.find(x => x.userID === adminID); const d = { ...ad, phoneNumber: document.getElementById('adminPhone').value, lineID: document.getElementById('adminLineID').value }; await fetch(`${USER_API_URL}/${adminID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); bootstrap.Modal.getInstance(document.getElementById('adminProfileModal')).hide(); alert('อัปเดตช่องทางติดต่อสำเร็จ!'); });
+        // ฟังก์ชัน PDF (ฉบับเต็ม) 
         async function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -596,246 +986,32 @@
             }
         }
 
-        
-        async function openAddTenantModal() {
-            try {
-                const response = await fetch(API_URL);
-                const rooms = await response.json();
-
-                const selectObj = document.getElementById('tenantRoomSelect');
-                selectObj.innerHTML = '<option value="" disabled selected>-- เลือกห้องพัก --</option>';
-
-                const availableRooms = rooms.filter(r => r.status === 'Available');
-
-                if (availableRooms.length === 0) {
-                    selectObj.innerHTML = '<option value="" disabled>❌ ตอนนี้ไม่มีห้องว่างเลยครับ</option>';
-                } else {
-                    availableRooms.forEach(r => {
-                        selectObj.innerHTML += `<option value="${r.roomID}">ห้อง ${r.roomNumber} (ค่าเช่า ฿${r.baseRent})</option>`;
-                    });
-                }
-
-                const modal = new bootstrap.Modal(document.getElementById('addTenantModal'));
-                modal.show();
-            } catch (error) {
-                alert('โหลดข้อมูลห้องไม่สำเร็จ');
-            }
-        }
-
-        
-        document.getElementById('addTenantForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const roomIdStr = document.getElementById('tenantRoomSelect').value;
-            if (!roomIdStr) {
-                alert('กรุณาเลือกห้องพักด้วยครับ');
-                return;
-            }
-
-            const newUserData = {
-                username: document.getElementById('tenantUsername').value,
-                passwordHash: document.getElementById('tenantPassword').value,
-                role: "Tenant",
-                fullName: document.getElementById('tenantFullName').value,
-                points: 0
-            };
-
-            try {
-                const userRes = await fetch(USER_API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newUserData)
-                });
-
-                if (userRes.ok) {
-                    const createdUser = await userRes.json(); 
-                    
-                    const roomID = parseInt(roomIdStr);
-                    const roomRes = await fetch(`${API_URL}/${roomID}`);
-                    const roomObj = await roomRes.json();
-                    
-                    roomObj.tenantID = createdUser.userID;
-                    roomObj.status = "Occupied"; 
-
-                    const updateRoomRes = await fetch(`${API_URL}/${roomID}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(roomObj)
-                    });
-
-                    if (updateRoomRes.ok) {
-                        bootstrap.Modal.getInstance(document.getElementById('addTenantModal')).hide();
-                        document.getElementById('addTenantForm').reset();
-                        fetchRooms(); 
-                        alert('เพิ่มผู้เช่าและย้ายเข้าห้องพักสำเร็จ! 🎉');
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-            }
-        });
-
-       
-        async function moveOut(roomID) {
-            if (confirm('ยืนยันการทำเรื่องย้ายออกสำหรับห้องนี้ใช่หรือไม่? \n(ห้องจะกลับมาเป็นสถานะ Available และถูกถอดชื่อผู้เช่าออก)')) {
-                try {
-                    const response = await fetch(`${API_URL}/${roomID}`);
-                    const roomData = await response.json();
-
-                    roomData.tenantID = null; 
-                    roomData.status = "Available"; 
-
-                    const updateRes = await fetch(`${API_URL}/${roomID}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(roomData)
-                    });
-
-                    if (updateRes.ok) {
-                        alert('ดำเนินการย้ายออกเรียบร้อยแล้ว ห้องกลับมาว่างพร้อมปล่อยเช่า! ✨');
-                        fetchRooms(); 
-                    }
-                } catch (error) {
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-                }
-            }
-        }
-        async function fetchInvoices() {
-            try {
-                const response = await fetch(INVOICE_API_URL);
-                const invoices = await response.json();
-                
-                const tableBody = document.getElementById('invoice-table-body');
-                tableBody.innerHTML = ''; 
-
-                
-                if (invoices.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">ยังไม่มีการออกบิลในระบบ</td></tr>';
-                    return;
-                }
-
-                invoices.forEach(inv => {
-                    
-                    let statusBadge = inv.status === 'Paid' 
-                        ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Paid</span>' 
-                        : '<span class="badge bg-danger"><i class="bi bi-exclamation-circle-fill"></i> Unpaid</span>';
-
-                    
-                    let roomNumberDisplay = inv.room ? `ห้อง ${inv.room.roomNumber}` : 'ไม่ทราบห้อง';
-
-                    
-                    let slipButton = inv.paymentSlipUrl 
-                        ? `<a href="http://localhost:5054${inv.paymentSlipUrl}" target="_blank" class="btn btn-sm btn-info text-white fw-bold shadow-sm">
-                             <i class="bi bi-image"></i> ดูสลิป
-                           </a>` 
-                        : '<span class="text-muted small">ยังไม่มีสลิป</span>';
-
-                    const row = `
-                        <tr>
-                            <td>#INV-${inv.invoiceID.toString().padStart(4, '0')}</td>
-                            <td><strong>${roomNumberDisplay}</strong></td>
-                            <td>${inv.billingMonth}</td>
-                            <td class="text-danger fw-bold">฿${inv.totalAmount.toLocaleString()}</td>
-                            <td>${statusBadge}</td>
-                            <td>${slipButton}</td> <td>
-                                <button class="btn btn-outline-danger btn-sm fw-bold shadow-sm" onclick="exportInvoicePDF(${inv.invoiceID})">
-                                    <i class="bi bi-file-earmark-pdf-fill"></i> โหลด PDF
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
-                });
-            } catch (error) {
-                console.error('Error fetching invoices:', error);
-            }
-        }
-        const MAINT_API_URL = 'http://localhost:5054/api/Maintenance';
-
-        
-        async function fetchMaintenance() {
-            try {
-                const response = await fetch(MAINT_API_URL);
-                const requests = await response.json();
-                const tbody = document.getElementById('admin-maintenance-body');
-                tbody.innerHTML = '';
-
-                if(requests.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted"> ไม่มีรายการแจ้งซ่อม</td></tr>';
-                    return;
-                }
-
-                requests.forEach(req => {
-                    let badge = '';
-                    if(req.status === 'Pending') badge = '<span class="badge bg-danger">รอดำเนินการ</span>';
-                    else if(req.status === 'In Progress') badge = '<span class="badge bg-warning text-dark">กำลังซ่อม</span>';
-                    else badge = '<span class="badge bg-success">เสร็จสิ้น</span>';
-
-                    let roomNum = req.room ? req.room.roomNumber : 'ไม่ทราบห้อง';
-                    let date = new Date(req.createdDate).toLocaleString('th-TH');
-
-                    
-                    let buttons = '';
-                    if(req.status === 'Pending') {
-                        buttons = `<button class="btn btn-sm btn-warning fw-bold text-dark" onclick="updateMaintStatus(${req.requestID}, 'In Progress')">🛠️ รับเรื่องซ่อม</button>`;
-                    } else if (req.status === 'In Progress') {
-                        buttons = `<button class="btn btn-sm btn-success fw-bold" onclick="updateMaintStatus(${req.requestID}, 'Resolved')">✅ ปิดงาน (ซ่อมเสร็จ)</button>`;
-                    } else {
-                        buttons = `<span class="text-success fw-bold">✔️ ปิดงานแล้ว</span>`;
-                    }
-
-                    const row = `
-                        <tr>
-                            <td>#REQ-${req.requestID}</td>
-                            <td><strong>ห้อง ${roomNum}</strong></td>
-                            <td class="text-danger">${req.description}</td>
-                            <td>${date}</td>
-                            <td>${badge}</td>
-                            <td>${buttons}</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-            } catch (error) { console.error(error); }
-        }
-        async function updateMaintStatus(id, newStatus) {
-            try {
-                const res = await fetch(`${MAINT_API_URL}/${id}/Status/${newStatus}`, { method: 'PUT' });
-                if(res.ok) {
-                    fetchMaintenance(); 
-                }
-            } catch(e) { alert('อัปเดตสถานะไม่สำเร็จ'); }
-        }
-        
         async function exportInvoicePDF(id) {
             try {
-                
                 const [invRes, userRes] = await Promise.all([
                     fetch(INVOICE_API_URL),
                     fetch(USER_API_URL)
                 ]);
-                
                 const invoices = await invRes.json();
                 const users = await userRes.json();
-                
                 const inv = invoices.find(i => i.invoiceID === id);
-                if (!inv) {
-                    alert('ไม่พบข้อมูลบิลนี้');
-                    return;
-                }
+                if (!inv) return alert('ไม่พบข้อมูลบิลนี้');
 
-                
                 let tenantName = "N/A (No Tenant)";
                 if (inv.room && inv.room.tenantID) {
                     const tenant = users.find(u => u.userID === inv.room.tenantID);
                     if (tenant) tenantName = tenant.fullName;
                 }
 
+                // 📌 ไฮไลต์การแก้บั๊ก: ดึงหน่วยมาคำนวณและแจกแจงแบบชัดเจน
+                const baseRent = inv.room ? inv.room.baseRent : 0;
+                const waterCost = (inv.waterUnit || 0) * 20;
+                const electricCost = (inv.electricUnit || 0) * 8;
+                const realTotalAmount = baseRent + waterCost + electricCost;
+
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
 
-                
                 doc.setFontSize(22);
                 doc.setFont("helvetica", "bold");
                 doc.setTextColor(41, 128, 185); 
@@ -848,12 +1024,10 @@
                 doc.setDrawColor(200, 200, 200);
                 doc.line(14, 28, 196, 28);
 
-                
                 doc.setFontSize(11);
                 doc.setFont("helvetica", "normal");
                 doc.setTextColor(0, 0, 0);
 
-                
                 doc.setFont("helvetica", "bold");
                 doc.text("BILL TO:", 14, 40);
                 doc.setFont("helvetica", "normal");
@@ -861,32 +1035,26 @@
                 const roomNum = inv.room ? inv.room.roomNumber : 'N/A';
                 doc.text(`Room: ${roomNum}`, 14, 55);
 
-               
                 doc.text(`Invoice No: INV-${inv.invoiceID.toString().padStart(4, '0')}`, 120, 40);
                 doc.text(`Date Issued: ${new Date().toLocaleDateString('en-GB')}`, 120, 48);
                 doc.text(`Billing Month: ${inv.billingMonth}`, 120, 55);
                 
-                
                 let statusText = inv.status === 'Paid' ? 'PAID' : 'UNPAID';
                 doc.setFont("helvetica", "bold");
-                if(inv.status === 'Paid') doc.setTextColor(46, 204, 113); // สีเขียว
-                else doc.setTextColor(231, 76, 60); // สีแดง
+                if(inv.status === 'Paid') doc.setTextColor(46, 204, 113); 
+                else doc.setTextColor(231, 76, 60); 
                 doc.text(`Status: ${statusText}`, 120, 62);
 
-                
-                const baseRent = inv.room ? inv.room.baseRent : 0;
-                const utilitiesCost = inv.totalAmount - baseRent;
-
+                // สร้างตาราง PDF ที่แจกแจงหน่วยและยอดรวมที่ถูกต้อง
                 doc.autoTable({
                     startY: 70,
-                    head: [['Description', 'Units', 'Amount (THB)']],
+                    head: [['Description', 'Units Used', 'Amount (THB)']],
                     body: [
-                        ['Monthly Room Rent', '1', baseRent.toLocaleString()],
-                        ['Water Usage', `${inv.waterUnit}`, '-'],
-                        ['Electricity Usage', `${inv.electricUnit}`, '-'],
-                        ['Other Utilities', '-', utilitiesCost.toLocaleString()]
+                        ['Monthly Room Rent', '-', baseRent.toLocaleString()],
+                        ['Water Usage (@ 20 THB/Unit)', `${inv.waterUnit || 0}`, waterCost.toLocaleString()],
+                        ['Electricity Usage (@ 8 THB/Unit)', `${inv.electricUnit || 0}`, electricCost.toLocaleString()]
                     ],
-                    foot: [['', 'GRAND TOTAL', `B ${inv.totalAmount.toLocaleString()}`]],
+                    foot: [['', 'GRAND TOTAL', `B ${realTotalAmount.toLocaleString()}`]],
                     theme: 'grid',
                     headStyles: { fillColor: [41, 128, 185], halign: 'center' },
                     columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' } },
@@ -894,7 +1062,6 @@
                     alternateRowStyles: { fillColor: [245, 250, 255] }
                 });
 
-                
                 const finalY = doc.lastAutoTable.finalY || 130;
                 doc.setFontSize(10);
                 doc.setFont("helvetica", "italic");
@@ -905,133 +1072,17 @@
                 doc.save(`Invoice_Room${roomNum}_${inv.billingMonth}.pdf`);
             } catch (error) {
                 console.error(error);
-                alert('เกิดข้อผิดพลาดในการดึงข้อมูลชื่อผู้เช่าเพื่อสร้าง PDF');
+                alert('เกิดข้อผิดพลาดในการสร้างไฟล์ PDF');
             }
         }
-        async function fetchTenants() {
-            try {
-                
-                const [usersRes, roomsRes] = await Promise.all([
-                    fetch(USER_API_URL),
-                    fetch(API_URL) 
-                ]);
-                const users = await usersRes.json();
-                const rooms = await roomsRes.json();
 
-                const tbody = document.getElementById('tenant-table-body');
-                tbody.innerHTML = '';
-
-                
-                const tenants = users.filter(u => u.role === 'Tenant');
-
-                if(tenants.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">ยังไม่มีข้อมูลผู้เช่าในระบบ</td></tr>';
-                    return;
-                }
-
-                tenants.forEach(tenant => {
-                    // หาห้องที่ผู้เช่าคนนี้อยู่
-                    const room = rooms.find(r => r.tenantID === tenant.userID);
-                    const roomDisplay = room ? `<span class="badge bg-primary">ห้อง ${room.roomNumber}</span>` : '<span class="badge bg-secondary">ยังไม่มีห้อง</span>';
-                    
-                    const phone = tenant.phoneNumber || '<span class="text-muted">-</span>';
-                    const lineId = tenant.lineID ? `<span class="text-success fw-bold">${tenant.lineID}</span>` : '<span class="text-muted">-</span>';
-
-                    const row = `
-                        <tr>
-                            <td>${tenant.userID}</td>
-                            <td><strong>${tenant.fullName}</strong></td>
-                            <td>${roomDisplay}</td>
-                            <td>${phone}</td>
-                            <td>${lineId}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-danger fw-bold" onclick="deleteTenant(${tenant.userID})">🗑️ ลบออกจากระบบ</button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-            } catch (error) {
-                console.error('Error fetching tenants:', error);
-            }
-        }
-        async function deleteTenant(userID) {
-            if (confirm('⚠️ ยืนยันการลบผู้เช่ารายนี้ใช่หรือไม่?\n\n(หากผู้เช่ารายนี้มีห้องพักอยู่ ระบบจะทำการเคลียร์ห้องให้กลับมา "ว่าง" โดยอัตโนมัติ)')) {
-                try {
-                    const res = await fetch(`${USER_API_URL}/${userID}`, { method: 'DELETE' });
-                    if (res.ok) {
-                        alert('✅ ลบข้อมูลผู้เช่าเรียบร้อยแล้ว');
-                        fetchTenants();
-                        fetchRooms();   
-                    } else {
-                        alert('❌ ไม่สามารถลบข้อมูลได้');
-                    }
-                } catch (error) {
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-                }
-            }
-        }
-        
-        let adminUserID = null; 
-
-        async function openAdminProfile() {
-            try {
-                
-                const res = await fetch(USER_API_URL);
-                const users = await res.json();
-                const admin = users.find(u => u.role === 'Admin');
-                
-                if (admin) {
-                    adminUserID = admin.userID;
-                    document.getElementById('adminPhone').value = admin.phoneNumber || '';
-                    document.getElementById('adminLineID').value = admin.lineID || '';
-                    
-                    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('adminProfileModal'));
-                    modal.show();
-                } else {
-                    alert('ไม่พบข้อมูล Admin ในระบบ');
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        document.getElementById('adminProfileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            
-            const res = await fetch(USER_API_URL);
-            const users = await res.json();
-            const admin = users.find(u => u.userID === adminUserID);
-
-            const updateData = {
-                userID: admin.userID,
-                username: admin.username,
-                passwordHash: admin.passwordHash,
-                role: admin.role,
-                fullName: admin.fullName,
-                points: admin.points,
-                phoneNumber: document.getElementById('adminPhone').value,
-                lineID: document.getElementById('adminLineID').value
-            };
-
-            const putRes = await fetch(`${USER_API_URL}/${adminUserID}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData)
-            });
-
-            if (putRes.ok) {
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('adminProfileModal')).hide();
-                alert('✅ อัปเดตข้อมูลติดต่อหอพักเรียบร้อยแล้ว! ข้อมูลจะไปโชว์ที่หน้าผู้เช่าทันที');
-            }
-        });
-       window.onload = function() {
+        // โหลดข้อมูลเมื่อเปิดเว็บ
+        window.onload = function() {
             fetchRooms();
             fetchInvoices();
             fetchMaintenance();
             fetchTenants();
         };
-
-        
     </script>
 </body>
 </html>

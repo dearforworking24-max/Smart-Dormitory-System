@@ -6,13 +6,12 @@
     <title>Dormitory Tenant Portal</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/flatly/bootstrap.min.css" rel="stylesheet">
-    
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
-        
         body, h1, h2, h3, h4, h5, h6, .navbar-brand, .modal-title, .btn {
             font-family: 'Prompt', sans-serif !important;
         }
@@ -38,14 +37,91 @@
             font-size: 2rem;
             margin-bottom: 10px;
         }
+
+        /* ================= Custom Dark Mode สีดำพรีเมียม ================= */
+        [data-bs-theme="dark"] body {
+            background-color: #121212 !important; 
+            color: #e0e0e0;
+        }
+        [data-bs-theme="dark"] .card, [data-bs-theme="dark"] .bg-white {
+            background-color: #1e1e1e !important; 
+            border: 1px solid #333 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        [data-bs-theme="dark"] .card-header {
+            background-color: #252525 !important;
+            border-bottom: 1px solid #333 !important;
+        }
+        [data-bs-theme="dark"] .table {
+            --bs-table-bg: transparent;
+            color: #e0e0e0;
+        }
+        [data-bs-theme="dark"] .table-light th {
+            background-color: #252525 !important;
+            color: #fff;
+            border-bottom: 1px solid #444;
+        }
+        [data-bs-theme="dark"] .navbar {
+            background-color: #0a0a0a !important; 
+        }
+        /* ปรับแต่ง Modal และ Input ในโหมดมืด */
+        [data-bs-theme="dark"] .modal-content {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0;
+        }
+        [data-bs-theme="dark"] .modal-header {
+            border-bottom: 1px solid #333 !important;
+        }
+        [data-bs-theme="dark"] .modal-footer {
+            border-top: 1px solid #333 !important;
+            background-color: #1e1e1e !important;
+        }
+        [data-bs-theme="dark"] input.form-control {
+            background-color: #252525;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        [data-bs-theme="dark"] input.form-control:focus {
+            background-color: #2a2a2a;
+            border-color: #0d6efd;
+            color: #fff;
+        }
+        [data-bs-theme="dark"] .input-group-text {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        [data-bs-theme="dark"] .text-dark {
+            color: #ffffff !important;
+        }
+
+        /* 📌 คืนชีพสีให้การ์ดในหน้า Tenant (สไตล์เรืองแสง + ขอบซ้าย) */
+        [data-bs-theme="dark"] #card-points {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), #1e1e1e) !important;
+            border: 1px solid rgba(255, 193, 7, 0.3) !important;
+            border-left: 5px solid #ffc107 !important; /* แถบสีเหลือง */
+        }
+        [data-bs-theme="dark"] #card-contact {
+            background: linear-gradient(135deg, rgba(13, 202, 240, 0.15), #1e1e1e) !important;
+            border: 1px solid rgba(13, 202, 240, 0.3) !important;
+            border-left: 5px solid #0dcaf0 !important; /* แถบสีฟ้า */
+        }
+        [data-bs-theme="dark"] #card-points *, [data-bs-theme="dark"] #card-contact * {
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body class="bg-light">
 
     <nav class="navbar navbar-dark bg-primary shadow-sm mb-4">
-        <div class="container">
+        <div class="container d-flex justify-content-between align-items-center">
             <span class="navbar-brand mb-0 h1 fw-bold"><i class="bi bi-buildings-fill me-2"></i>Tenant Portal</span>
-            <button id="logoutBtn" class="btn btn-danger btn-sm d-none fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+            <div>
+                <button id="themeToggleBtn" class="btn btn-outline-light btn-sm me-2 fw-bold d-none" onclick="toggleTheme()">
+                    <i class="bi bi-moon-fill" id="themeIcon"></i> โหมดมืด
+                </button>
+                <button id="logoutBtn" class="btn btn-danger btn-sm d-none fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>ออกจากระบบ</button>
+            </div>
         </div>
     </nav>
 
@@ -88,7 +164,7 @@
 
             <div class="row mb-4 px-2">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <div class="card bg-warning text-dark h-100">
+                    <div class="card bg-warning text-dark h-100" id="card-points">
                         <div class="card-body text-center py-4 d-flex flex-column justify-content-center">
                             <h5 class="card-title fw-bold text-dark mb-0"><i class="bi bi-star-fill text-white me-2"></i>My Points</h5>
                             <h1 class="display-2 fw-bold my-2" id="user-points">0</h1>
@@ -98,7 +174,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card border-info h-100">
+                    <div class="card border-info h-100" id="card-contact">
                         <div class="card-header bg-info text-white">
                             <h5 class="mb-0 fw-bold"><i class="bi bi-headset me-2"></i>ติดต่อผู้ดูแล (Contact Admin)</h5>
                         </div>
@@ -141,7 +217,7 @@
                     <div class="card-body">
                         <form id="maintenanceForm" class="mb-4">
                             <div class="input-group shadow-sm">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-chat-text text-danger"></i></span>
+                                <span class="input-group-text border-end-0"><i class="bi bi-chat-text text-danger"></i></span>
                                 <input type="text" id="maintDescription" class="form-control border-start-0 ps-0" placeholder="ระบุปัญหาที่ต้องการแจ้ง เช่น แอร์ไม่เย็น, น้ำรั่ว..." required>
                                 <button class="btn btn-danger fw-bold px-4" type="submit"><i class="bi bi-send-fill me-1"></i>ส่งเรื่อง</button>
                             </div>
@@ -207,15 +283,15 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info border-0">
                         <i class="bi bi-info-circle-fill me-2"></i>เพื่อความรวดเร็วในการตรวจสอบยอดเงิน กรุณาแนบหลักฐานการโอนเงินครับ
                     </div>
                     <div class="mb-3 mt-4">
-                        <label class="form-label fw-bold text-dark"><i class="bi bi-image me-2"></i>อัปโหลดสลิป (ถ้ามี)</label>
+                        <label class="form-label fw-bold"><i class="bi bi-image me-2"></i>อัปโหลดสลิป (ถ้ามี)</label>
                         <input type="file" class="form-control" id="slipFileInput" accept="image/*">
                     </div>
                 </div>
-                <div class="modal-footer bg-light border-top-0">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary fw-bold" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>ยกเลิก</button>
                     <button type="button" class="btn btn-primary fw-bold" onclick="submitPayment()"><i class="bi bi-check-circle-fill me-1"></i>ยืนยันชำระเงิน</button>
                 </div>
@@ -226,7 +302,35 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        const API_BASE = 'http://localhost:5054/api'; 
+        // ================= ระบบ Dark/Light Mode =================
+        const htmlElement = document.documentElement; 
+        const themeIcon = document.getElementById('themeIcon');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+        const savedTheme = localStorage.getItem('dormTheme') || 'light';
+        applyTheme(savedTheme);
+
+        function toggleTheme() {
+            const currentTheme = htmlElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem('dormTheme', newTheme);
+        }
+
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-bs-theme', theme);
+            if (themeIcon && themeToggleBtn) {
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun-fill text-warning'; 
+                    themeToggleBtn.innerHTML = '<i class="bi bi-sun-fill text-warning"></i> โหมดสว่าง';
+                } else {
+                    themeIcon.className = 'bi bi-moon-fill'; 
+                    themeToggleBtn.innerHTML = '<i class="bi bi-moon-fill"></i> โหมดมืด';
+                }
+            }
+        }
+
+        const BASE_URL = 'https://smart-dormitory-api.onrender.com';
         let loggedInUser = JSON.parse(localStorage.getItem('tenantUser'));
         let currentRoomID = null; 
 
@@ -234,7 +338,6 @@
             if (loggedInUser) showDashboard();
         };
 
-        
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value;
@@ -263,7 +366,11 @@
         function showDashboard() {
             document.getElementById('login-section').classList.add('d-none');
             document.getElementById('dashboard-section').classList.remove('d-none');
+            
+            // สลับโหมดและปุ่มออกจากระบบเมื่อ Login สำเร็จ
+            document.getElementById('themeToggleBtn').classList.remove('d-none');
             document.getElementById('logoutBtn').classList.remove('d-none');
+            
             document.getElementById('welcomeName').innerText = loggedInUser.fullName;
             loadTenantDashboard();
             loadMaintenanceHistory(); 
@@ -276,9 +383,7 @@
             }
         }
 
-        // โหลดข้อมูล Dashboard 
         async function loadTenantDashboard() {
-            // ดึงข้อมูลติดต่อแอดมินมาโชว์
             try {
                 const contactRes = await fetch(`${API_BASE}/Users/AdminContact`);
                 if (contactRes.ok) {
@@ -286,14 +391,13 @@
                     document.getElementById('dorm-phone').innerText = contactData.phoneNumber;
                     document.getElementById('dorm-line').innerText = contactData.lineID;
                 }
-            } catch(e) {} // กัน error ถ้าไม่มี admin
+            } catch(e) {} 
 
             try {
                 const userRes = await fetch(`${API_BASE}/Users`);
                 const allUsers = await userRes.json();
                 const latestUserData = allUsers.find(u => u.userID === loggedInUser.userID);
                 
-                // อัปเดตข้อมูลล่าสุดให้ User เสมอ
                 if(latestUserData) {
                     loggedInUser.fullName = latestUserData.fullName;
                     loggedInUser.phoneNumber = latestUserData.phoneNumber;
@@ -320,7 +424,7 @@
                         tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">ไม่พบรายการบิล</td></tr>';
                     }
 
-                    invoices.forEach(inv => {
+                   invoices.forEach(inv => {
                         let statusBadge = inv.status === 'Paid' 
                             ? '<span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Paid</span>' 
                             : '<span class="badge bg-danger px-3 py-2"><i class="bi bi-exclamation-circle-fill me-1"></i> Unpaid</span>';
@@ -329,12 +433,20 @@
                             ? `<button class="btn btn-sm btn-primary fw-bold" onclick="payBill(${inv.invoiceID})"><i class="bi bi-credit-card-fill me-1"></i> Pay Now</button>` 
                             : `<button class="btn btn-sm btn-outline-success fw-bold" disabled><i class="bi bi-check-circle-fill me-1"></i> Success</button>`;
                         
+                        let pdfButton = `<button class="btn btn-sm btn-outline-danger fw-bold ms-2 shadow-sm" onclick="downloadInvoicePDF(${inv.invoiceID})"><i class="bi bi-file-earmark-pdf-fill"></i> PDF</button>`;
+                        
+                        //  คำนวณยอดรวม
+                        let baseRent = inv.room ? inv.room.baseRent : 0;
+                        let waterCost = (inv.waterUnit || 0) * 20;
+                        let electricCost = (inv.electricUnit || 0) * 8;
+                        let realTotalAmount = baseRent + waterCost + electricCost;
+
                         tableBody.innerHTML += `
                             <tr>
                                 <td class="ps-4 fw-bold text-secondary">${inv.billingMonth}</td>
-                                <td class="text-danger fw-bold fs-5">฿${inv.totalAmount.toLocaleString()}</td>
+                                <td class="text-danger fw-bold fs-5">฿${realTotalAmount.toLocaleString()}</td>
                                 <td>${statusBadge}</td>
-                                <td class="text-end pe-4">${payButton}</td>
+                                <td class="text-end pe-4">${payButton} ${pdfButton}</td>
                             </tr>
                         `;
                     });
@@ -399,7 +511,6 @@
                 if (response.ok) loadTenantDashboard();
             }
         }
-
         
         async function loadMaintenanceHistory() {
             try {
@@ -468,7 +579,6 @@
             }
         });
 
-        
         function openProfileModal() {
             document.getElementById('profileFullName').value = loggedInUser.fullName || '';
             document.getElementById('profilePhone').value = loggedInUser.phoneNumber || '';
@@ -522,6 +632,93 @@
                 alert('เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์');
             }
         });
+        // PDF สำหรับผู้เช่า 
+       
+        async function downloadInvoicePDF(id) {
+            try {
+                // ดึงข้อมูลบิล
+                const invRes = await fetch(`${API_BASE}/Invoices/Tenant/${loggedInUser.userID}`);
+                const invoices = await invRes.json();
+                const inv = invoices.find(i => i.invoiceID === id);
+                
+                if (!inv) return alert('ไม่พบข้อมูลบิลนี้');
+
+                //  คำนวณยอดและหน่วย
+                const tenantName = loggedInUser.fullName || 'Tenant';
+                const roomNum = inv.room ? inv.room.roomNumber : 'N/A';
+                
+                const baseRent = inv.room ? inv.room.baseRent : 0;
+                const waterCost = (inv.waterUnit || 0) * 20;     // สมมติค่าน้ำหน่วยละ 20
+                const electricCost = (inv.electricUnit || 0) * 8; // สมมติค่าไฟหน่วยละ 8
+                const grandTotal = baseRent + waterCost + electricCost; 
+
+                //  เริ่มวาด PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(22);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(41, 128, 185); 
+                doc.text("SMART DORMITORY", 14, 22);
+
+                doc.setFontSize(24);
+                doc.setTextColor(50, 50, 50); 
+                doc.text("INVOICE", 155, 22);
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(14, 28, 196, 28);
+
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(0, 0, 0);
+
+                doc.setFont("helvetica", "bold");
+                doc.text("BILL TO:", 14, 40);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Name: ${tenantName}`, 14, 48); 
+                doc.text(`Room: ${roomNum}`, 14, 55);
+
+                doc.text(`Invoice No: INV-${inv.invoiceID.toString().padStart(4, '0')}`, 120, 40);
+                doc.text(`Date Issued: ${new Date().toLocaleDateString('en-GB')}`, 120, 48);
+                doc.text(`Billing Month: ${inv.billingMonth}`, 120, 55);
+                
+                let statusText = inv.status === 'Paid' ? 'PAID' : 'UNPAID';
+                doc.setFont("helvetica", "bold");
+                if(inv.status === 'Paid') doc.setTextColor(46, 204, 113); 
+                else doc.setTextColor(231, 76, 60); 
+                doc.text(`Status: ${statusText}`, 120, 62);
+
+                // สร้างตารางแจกแจงรายการ
+                doc.autoTable({
+                    startY: 70,
+                    head: [['Description', 'Units Used', 'Amount (THB)']],
+                    body: [
+                        ['Monthly Room Rent', '-', baseRent.toLocaleString()],
+                        ['Water Usage (@ 20 THB/Unit)', `${inv.waterUnit || 0}`, waterCost.toLocaleString()],
+                        ['Electricity Usage (@ 8 THB/Unit)', `${inv.electricUnit || 0}`, electricCost.toLocaleString()]
+                    ],
+                    foot: [['', 'GRAND TOTAL', `B ${grandTotal.toLocaleString()}`]],
+                    theme: 'grid',
+                    headStyles: { fillColor: [41, 128, 185], halign: 'center' },
+                    columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' } },
+                    footStyles: { fillColor: [23, 162, 184], textColor: 255, fontStyle: 'bold', halign: 'right' },
+                    alternateRowStyles: { fillColor: [245, 250, 255] }
+                });
+
+                const finalY = doc.lastAutoTable.finalY || 130;
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "italic");
+                doc.setTextColor(150, 150, 150);
+                doc.text("Please keep this invoice as proof of payment.", 105, finalY + 15, { align: "center" });
+                doc.text("Smart Dormitory Management System", 105, finalY + 22, { align: "center" });
+
+                //  บันทึกไฟล์
+                doc.save(`MyInvoice_Room${roomNum}_${inv.billingMonth}.pdf`);
+            } catch (error) {
+                console.error("PDF Error: ", error); // พิมพ์ Error ลง Console 
+                alert('เกิดข้อผิดพลาดในการสร้างไฟล์ PDF');
+            }
+        }
     </script>
 </body>
 </html>
